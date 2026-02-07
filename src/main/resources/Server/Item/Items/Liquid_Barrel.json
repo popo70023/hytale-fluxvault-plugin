@@ -1,0 +1,72 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Barrel_Liquid.name",
+    "Description": "server.items.Barrel_Liquid.description"
+  },
+  "Id": "Liquid Barrel",
+  "MaxStack": 10,
+  "PlayerAnimationsId": "Block",
+  "Categories": [
+    "Furniture.Containers"
+  ],
+  "Set": "Furniture_Tavern",
+  "Icon": "Icons/ItemsGenerated/Furniture_Tavern_Barrel.png",
+  "BlockType": {
+    "BlockParticleSetId": "Wood",
+    "CustomModel": "Blocks/container/Barrel.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/container/Barrel_Liquid.png",
+        "Weight": 1
+      }
+    ],
+    "DrawType": "Model",
+    "Flags": {},
+    "Gathering": {
+      "Soft": {
+        "DropList": "Barrels"
+      }
+    },
+    "HitboxType": "Chest_Small",
+    "Material": "Solid",
+    "Opacity": "Transparent",
+    "ParticleColor": "#543022",
+    "RandomRotation": "YawStep1",
+    "Support": {
+      "Up": [
+        {
+          "FaceType": "Branch"
+        }
+      ],
+      "Down": [
+        {
+          "FaceType": "Full"
+        },
+        {
+          "FaceType": "Barrel"
+        }
+      ]
+    },
+    "BlockSoundSetId": "Wood",
+    "Interactions": {
+      "Use": "Simple_Liquid_Container_Interaction"
+    }
+  },
+  "ResourceTypes": [
+    {
+      "Id": "Fuel"
+    },
+    {
+      "Id": "Charcoal"
+    }
+  ],
+  "Tags": {
+    "Type": [
+      "Furniture"
+    ],
+    "Family": [
+      "Tavern"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Wood"
+}
