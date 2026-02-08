@@ -48,6 +48,7 @@ public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T
 
     /**
      * Finds the index of a specific resource (ignoring quantity).
+     *
      * @return The index, or -1 if not found.
      */
     int findContentIndex(D content);

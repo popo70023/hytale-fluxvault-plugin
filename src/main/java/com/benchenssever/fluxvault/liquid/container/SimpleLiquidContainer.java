@@ -62,57 +62,90 @@ public class SimpleLiquidContainer extends LiquidContainer {
         return this.content.getQuantity();
     }
 
-    //TODO: 這裡的邏輯需要仔細考慮，特別是關於無限內容和容量的處理。需要確保在模擬模式下不會改變內容，並且在實際執行時正確地處理填充和抽取的邏輯。
     @NonNullDecl
     @Override
     public LiquidFlux fill(LiquidFlux resource, FluxAction action) {
-        LiquidStack resourceStack = resource.getStack(0);
-        if (resourceStack.getQuantity() == Long.MAX_VALUE && isInfiniteContent()) {
-            this.content = new LiquidStack(resourceStack.getLiquid(), getContainerCapacity());
-            return new LiquidFlux(this.content);
-        }
-
-        if (resource.isEmpty() || !canAcceptLiquid(resourceStack) || !(this.content.isEmpty() || this.content.isLiquidEqual(resourceStack.getLiquid())) || (isInfiniteContent() && !content.isEmpty())) {
-            return new LiquidFlux();
-        }
+        resource.cleanFlux();
+        if (resource.isEmpty() || (isInfiniteContent() && !this.content.isEmpty())) return resource;
 
         if (isInfiniteContent() && this.content.isEmpty()) {
-            return resourceStack.getQuantity() < getContainerCapacity() ? resource : new LiquidFlux(new LiquidStack(resourceStack.getLiquid(), getContainerCapacity()));
+            if (action.simulate()) resource = resource.copy();
+            LiquidStack resourceStack = resource.getStack(0);
+            if (resourceStack.addQuantity(-getContainerCapacity()) == 0) {
+                resource.setStack(0, LiquidStack.EMPTY);
+                resource.cleanFlux();
+            } else {
+                resource.setStack(0, resourceStack);
+            }
+            return resource;
+        }
+
+        int targetIndex = 0;
+        if (!this.content.isEmpty()) {
+            targetIndex = resource.getIndexOf(this.content);
+            if (targetIndex == -1) return resource;
+        }
+
+        LiquidStack resourceStack = resource.getStack(targetIndex);
+        if (resourceStack.isEmpty() || !canAcceptLiquid(resourceStack)) {
+            return resource;
         }
 
         long spaceAvailable = getContainerCapacity() - this.content.getQuantity();
-        if (spaceAvailable <= 0) return new LiquidFlux();
-        LiquidStack canFill = new LiquidStack(resourceStack.getLiquid(), Math.min(spaceAvailable, resourceStack.getQuantity()));
+        if (spaceAvailable <= 0) return resource;
 
-        if (action.execute() && !canFill.isEmpty()) {
+        long canFill = Math.min(spaceAvailable, resourceStack.getQuantity());
+
+        if (action.execute()) {
             if (this.content.isEmpty()) {
-                this.content = canFill;
+                this.content = new LiquidStack(resourceStack.getLiquid(), canFill);
             } else {
-                this.content.addQuantity(canFill.getQuantity());
+                this.content.addQuantity(canFill);
             }
             onContentsChanged();
         }
-        return new LiquidFlux(canFill);
+
+        if (action.simulate()) {
+            resource = resource.copy();
+            resourceStack = resource.getStack(targetIndex);
+        }
+        resourceStack.addQuantity(-canFill);
+        if (resourceStack.isEmpty()) {
+            resource.setStack(targetIndex, LiquidStack.EMPTY);
+            resource.cleanFlux();
+        } else {
+            resource.setStack(targetIndex, resourceStack);
+        }
+
+        return resource;
     }
 
-    //TODO: 這裡的邏輯需要仔細考慮，特別是關於無限內容和容量的處理。需要確保在模擬模式下不會改變內容，並且在實際執行時正確地處理填充和抽取的邏輯。
     @NonNullDecl
     @Override
-    public LiquidFlux drain(LiquidFlux maxDrainResource, FluxAction action) {
-        LiquidStack resourceStack = maxDrainResource.getStack(0);
-        if (resourceStack.isEmpty() || this.content.isEmpty() || !this.content.isLiquidEqual(resourceStack.getLiquid())) {
-            return new LiquidFlux();
-        }
-        long maxDrainQuantity = resourceStack.getQuantity();
-        if (isInfiniteContent() && !this.content.isEmpty()) {
-            return new LiquidFlux(new LiquidStack(this.content.getLiquid(), Math.min(maxDrainQuantity, getContainerCapacity())));
+    public LiquidFlux drain(LiquidFlux requestResources, FluxAction action) {
+        requestResources.cleanFlux();
+        if (this.content.isEmpty() || requestResources.isEmpty()) return new LiquidFlux();
+        if (!requestResources.matches(this.content)) return new LiquidFlux();
+
+        int targetIndex = requestResources.getIndexOf(this.content);
+        if (targetIndex == -1) targetIndex = requestResources.getIndexOf(LiquidStack.EMPTY);
+        if (targetIndex == -1) return new LiquidFlux();
+        LiquidStack requestStack = requestResources.getStack(targetIndex);
+
+        long requestQuantity = requestStack.getQuantity();
+        if (requestQuantity <= 0) return new LiquidFlux();
+
+        if (isInfiniteContent()) {
+            if (action.execute()) {
+                requestStack.addQuantity(-getContainerCapacity());
+                if (requestStack.isEmpty()) requestStack = LiquidStack.EMPTY;
+                requestResources.setStack(targetIndex, requestStack);
+                requestResources.cleanFlux();
+            }
+            return new LiquidFlux(new LiquidStack(this.content.getLiquid(), Math.min(requestQuantity, getContainerCapacity())));
         }
 
-        long toDrain = Math.min(maxDrainQuantity, this.content.getQuantity());
-        if (this.content.isEmpty() || toDrain == 0) {
-            return new LiquidFlux();
-        }
-
+        long toDrain = Math.min(requestQuantity, this.content.getQuantity());
         LiquidStack stack = new LiquidStack(this.content.getLiquid(), toDrain);
         if (action.execute() && toDrain > 0) {
             this.content.addQuantity(-toDrain);
@@ -120,6 +153,16 @@ public class SimpleLiquidContainer extends LiquidContainer {
                 this.content = LiquidStack.EMPTY;
             }
             onContentsChanged();
+        }
+
+        if (action.execute()) {
+            requestStack.addQuantity(-toDrain);
+            if (requestStack.isEmpty()) {
+                requestResources.setStack(targetIndex, LiquidStack.EMPTY);
+                requestResources.cleanFlux();
+            } else {
+                requestResources.setStack(targetIndex, requestStack);
+            }
         }
 
         return new LiquidFlux(stack);

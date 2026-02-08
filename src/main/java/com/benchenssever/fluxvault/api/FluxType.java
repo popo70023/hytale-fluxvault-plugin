@@ -16,10 +16,14 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
  */
 public final class FluxType<T extends IFlux<T, D>, D> {
 
-    /** Standard type for Liquid resources. */
+    /**
+     * Standard type for Liquid resources.
+     */
     public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("LIQUID", LiquidFlux.class, LiquidStack.class);
 
-    /** Standard type for Item resources. */
+    /**
+     * Standard type for Item resources.
+     */
     public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("ITEM", ItemFlux.class, ItemStack.class);
 
     private final String name;

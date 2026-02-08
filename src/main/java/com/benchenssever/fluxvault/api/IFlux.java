@@ -32,9 +32,12 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
 
     /**
      * Retrieves the stack at the specified index.
+     *
      * @return The stack, or an empty/null value if out of bounds.
      */
     D getStack(int index);
+
+    int getIndexOf(D stack);
 
     /**
      * Replaces the stack at the specified index.
@@ -72,6 +75,7 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
 
     /**
      * Sets a transient validator for this carrier.
+     *
      * @return This instance for chaining.
      */
     T withValidator(Predicate<D> validator);
@@ -83,6 +87,8 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
         if (targetData == null) return false;
         return getValidator().test(targetData);
     }
+
+    boolean matcheStack(D stack, D reference);
 
     /**
      * @return A deep copy of this carrier.

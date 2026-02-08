@@ -8,13 +8,11 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import java.util.Objects;
 
 public class LiquidStack {
+    public final static LiquidStack EMPTY = new LiquidStack();
     public static final BuilderCodec<LiquidStack> CODEC = BuilderCodec.builder(LiquidStack.class, LiquidStack::new)
             .append(new KeyedCodec<>("liquidId", Codec.STRING), LiquidStack::setLiquidId, LiquidStack::getLiquidId).add()
             .append(new KeyedCodec<>("quantity", Codec.LONG), LiquidStack::setQuantity, LiquidStack::getQuantity).add()
             .build();
-
-    public final static LiquidStack EMPTY = new LiquidStack();
-
     private String liquidId;
     private long quantity;
     private transient Liquid liquid;
@@ -73,7 +71,7 @@ public class LiquidStack {
     }
 
     public Liquid getLiquid() {
-        if(this.liquid == null) refreshLiquidCache();
+        if (this.liquid == null) refreshLiquidCache();
         return this.liquid;
     }
 

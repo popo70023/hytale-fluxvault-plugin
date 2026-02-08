@@ -38,17 +38,25 @@ public interface IFluxHandler<T extends IFlux<T, D>, D> {
      * Operation mode for Flux interactions.
      */
     enum FluxAction {
-        /** Modifies the state (Standard operation). */
+        /**
+         * Modifies the state (Standard operation).
+         */
         EXECUTE,
-        /** Calculates result without modifying state (Prediction/Check). */
+        /**
+         * Calculates result without modifying state (Prediction/Check).
+         */
         SIMULATE;
 
-        /** @return True if this is an execution action. */
+        /**
+         * @return True if this is an execution action.
+         */
         public boolean execute() {
             return this == EXECUTE;
         }
 
-        /** @return True if this is a simulation action. */
+        /**
+         * @return True if this is a simulation action.
+         */
         public boolean simulate() {
             return this == SIMULATE;
         }

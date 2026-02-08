@@ -96,6 +96,11 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
     }
 
     @Override
+    public boolean matcheStack(ItemStack stack, ItemStack reference) {
+        return stack.getItem().equals(reference.getItem());
+    }
+
+    @Override
     public ItemFlux copy() {
         List<ItemStack> newStacks = new ArrayList<>(stacks.size());
 

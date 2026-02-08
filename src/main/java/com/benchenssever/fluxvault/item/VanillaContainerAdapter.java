@@ -102,7 +102,7 @@ public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemSta
     @Override
     public long getAllContentQuantity() {
         long count = 0;
-        for(int i=0; i<getContainerMaxSize(); i++) {
+        for (int i = 0; i < getContainerMaxSize(); i++) {
             ItemStack s = getContent(i);
             if (s != null) count += s.getQuantity();
         }

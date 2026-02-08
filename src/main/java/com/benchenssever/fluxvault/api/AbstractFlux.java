@@ -80,6 +80,21 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         }
 
         @Override
+        public int getIndexOf(D stack) {
+            if (stack == null) return -1;
+
+            for (int i = 0; i < stacks.size(); i++) {
+                D current = stacks.get(i);
+                // 這裡的 matches 需要你根據你的 D 類型來定義
+                // 或是依賴子類別覆寫此方法
+                if (matcheStack(current, stack)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        @Override
         public void setStack(int index, D stack) {
             if (index >= 0 && index < stacks.size()) {
                 stacks.set(index, stack);
@@ -128,6 +143,12 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         @Override
         public D getStack(int index) {
             return index == 0 ? content : null;
+        }
+
+        @Override
+        public int getIndexOf(D stack) {
+            if (stack == null) return -1;
+            return matcheStack(content, stack) ? 0 : -1;
         }
 
         @Override
