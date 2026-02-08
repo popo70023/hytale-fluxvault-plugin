@@ -1,16 +1,11 @@
 package com.benchenssever.fluxvault.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Represents a handler that also exposes internal storage state.
- * <p>
- * While {@link IFluxHandler} handles interaction (I/O), {@code IFluxContainer}
- * allows inspection of the contents, often used for GUIs, rendering, or debug info.
- * </p>
+ * A handler that exposes internal storage state for inspection and direct manipulation.
+ * Used for GUIs, rendering, debugging, or complex automation logic.
  *
  * @param <T> The carrier type.
  * @param <D> The data type.
@@ -18,87 +13,62 @@ import java.util.function.Predicate;
 public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T, D> {
 
     /**
-     * Gets the maximum number of distinct stacks this container can hold.
-     * <p>
-     * For fixed inventories (Battery Box), this is the physical slot count.
-     * For dynamic tanks (Smeltery), this might be {@link Integer#MAX_VALUE} or the current list size.
-     * </p>
-     *
-     * @return The max slot count. Avoid using negative numbers.
+     * @return The maximum number of distinct stacks (slots) this container can hold.
      */
     int getContainerMaxSize();
 
     /**
-     * Retrieves the data stack in a specific slot.
-     * <p>
-     * <b>Note:</b> The returned object should generally be treated as read-only.
-     * Modification logic should be handled via {@link #fill} or {@link #drain}.
-     * </p>
-     *
-     * @param index The slot index.
-     * @return The content in the slot, or an empty stack/null depending on implementation.
-     */
-    D getContent(int index);
-
-    /**
-     * Retrieves a snapshot view of all contents in this container.
-     * <p>
-     * <b>Implementation Note:</b>
-     * The structure of this list depends on the container type:
-     * <ul>
-     * <li><b>Slot-based (Inventory):</b> May contain empty stacks or nulls to preserve slot indices (e.g., for GUI rendering).</li>
-     * <li><b>Volume-based (Tank):</b> Typically returns a compacted list of stored resources without gaps.</li>
-     * </ul>
-     * Callers should be prepared to handle empty or null entries when iterating this list.
-     * </p>
-     *
-     * @return A list of all contents.
+     * Retrieves a snapshot view of contents.
+     * Note: May contain nulls or empty stacks depending on implementation.
      */
     List<D> getContents();
 
     /**
-     * Callback triggered when the contents of the container change.
-     * <p>
-     * Used for saving data, syncing with clients, or updating comparators.
-     * </p>
+     * Retrieves content in a specific slot. Treat as read-only.
+     */
+    D getContent(int index);
+
+    /**
+     * Directly sets content in a slot. Bypasses standard I/O checks.
+     * Used for creative mode, editors, or exact syncing.
+     */
+    void setContent(int index, D content);
+
+    /**
+     * Attempts to add content, merging if possible.
+     *
+     * @return The remainder that couldn't fit.
+     */
+    D addContent(D content);
+
+    /**
+     * @return The index of the first non-empty stack, or -1.
+     */
+    int getFirstContentIndex();
+
+    /**
+     * Finds the index of a specific resource (ignoring quantity).
+     * @return The index, or -1 if not found.
+     */
+    int findContentIndex(D content);
+
+    /**
+     * Callback triggered when contents change.
      */
     void onContentsChanged();
 
     /**
-     * Gets the maximum capacity of this container.
-     * <p>
-     * The interpretation of this value depends on {@link #isSharedCapacity()}.
-     * </p>
-     *
-     * @return The max capacity.
+     * @return The max capacity of this container.
      */
     long getContainerCapacity();
 
     /**
-     * Determines if the capacity is shared across all contained fluids/items.
-     *
-     * @return {@code true} if capacity is a global pool (e.g., total volume shared by gases);
-     * {@code false} if each slot has independent limits (default).
-     */
-    default boolean isSharedCapacity() {
-        return false;
-    }
-
-    /**
-     * Gets the total quantity of all stored resources combined.
-     *
-     * @return The total stored quantity.
+     * @return The total stored quantity combined.
      */
     long getAllContentQuantity();
 
     /**
-     * Gets the internal validation logic for this container.
-     * <p>
-     * This predicate defines what this container is allowed to hold (e.g., voltage limits,
-     * whitelist/blacklist filters). It is checked during {@link #fill} operations.
-     * </p>
-     *
-     * @return The validation predicate. Defaults to "always true".
+     * @return The validation predicate for allowed contents.
      */
     default Predicate<D> getValidator() {
         return _ -> true;

@@ -42,7 +42,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
 
         if (capacity.isEmpty()) {
             LiquidFlux extracted = container.drain(new LiquidFlux(capacity), IFluxHandler.FluxAction.SIMULATE);
-            LiquidStack extractedStack = extracted.getFirstStack();
+            LiquidStack extractedStack = extracted.getStack(0);
             ItemStack newItemStack = capsuleType.getCapsuleWithLiquid(extractedStack.getLiquid());
             if (!newItemStack.isEmpty() && !extracted.isEmpty() && extractedStack.getQuantity() == capsuleType.getCapacity()) {
                 container.drain(extracted, IFluxHandler.FluxAction.EXECUTE);
@@ -50,7 +50,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
             }
         } else {
             LiquidFlux acceptedAmount = container.fill(new LiquidFlux(capacity), IFluxHandler.FluxAction.SIMULATE);
-            if (acceptedAmount.getFirstStack().isEqual(capacity)) {
+            if (acceptedAmount.getStack(0).isEqual(capacity)) {
                 container.fill(new LiquidFlux(capacity), IFluxHandler.FluxAction.EXECUTE);
                 return true;
             }

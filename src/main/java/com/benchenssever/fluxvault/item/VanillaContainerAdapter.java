@@ -4,14 +4,12 @@ import com.benchenssever.fluxvault.api.IFluxContainer;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
+import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 這就是那個「皮」。
- * 它負責把 Flux 的 fill/drain 指令翻譯成對原生箱子的操作。
- */
+//TODO: 這個類別的主要目標是將原生的 ItemContainer 包裝成一個符合 IFluxContainer<ItemFlux, ItemStack> 介面的適配器，讓我們可以用統一的方式來操作原生箱子裡的物品。核心邏輯會在 fill 和 drain 方法裡實作，確保它們能正確處理物品的堆疊和空位，同時尊重模擬模式的要求。
 public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemStack> {
 
     private final ItemContainer vanillaState;
@@ -31,17 +29,33 @@ public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemSta
     }
 
     @Override
-    public List<ItemStack> getContents() {
-        List<ItemStack> list = new ArrayList<>();
-        for (int i = 0; i < getContainerMaxSize(); i++) {
-            ItemStack stack = getContent(i);
-            if (stack != null && !stack.isEmpty()) {
-                list.add(stack);
-            }
-        }
-        return list;
+    public void setContent(int index, ItemStack content) {
+        this.vanillaState.setItemStackForSlot((short) index, content);
     }
 
+    @Override
+    public ItemStack addContent(ItemStack content) {
+        return this.vanillaState.addItemStack(content).getRemainder();
+    }
+
+    //TODO
+    @Override
+    public int getFirstContentIndex() {
+        return 0;
+    }
+
+    //TODO
+    @Override
+    public int findContentIndex(ItemStack content) {
+        return 0;
+    }
+
+    @Override
+    public List<ItemStack> getContents() {
+        return this.vanillaState.dropAllItemStacks();
+    }
+
+    @NonNullDecl
     @Override
     public ItemFlux fill(ItemFlux resource, FluxAction action) {
         if (resource.isEmpty()) return resource;
@@ -58,6 +72,7 @@ public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemSta
     }
 
     //TODO: 這裡的邏輯會比較麻煩，因為要考慮到堆疊優先、空位次之、模擬模式不修改原狀態等等
+    @NonNullDecl
     @Override
     public ItemFlux drain(ItemFlux maxDrainResource, FluxAction action) {
         // 實作從原生箱子找東西並扣除數量的邏輯

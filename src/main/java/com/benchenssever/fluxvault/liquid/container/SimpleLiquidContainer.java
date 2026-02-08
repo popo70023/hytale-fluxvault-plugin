@@ -33,6 +33,26 @@ public class SimpleLiquidContainer extends LiquidContainer {
     }
 
     @Override
+    public void setContent(int index, LiquidStack content) {
+        this.content = content;
+    }
+
+    @Override
+    public LiquidStack addContent(LiquidStack content) {
+        return content;
+    }
+
+    @Override
+    public int getFirstContentIndex() {
+        return 0;
+    }
+
+    @Override
+    public int findContentIndex(LiquidStack content) {
+        return this.content.isLiquidEqual(content.getLiquid()) ? 0 : -1;
+    }
+
+    @Override
     public List<LiquidStack> getContents() {
         return List.of(this.content);
     }
@@ -42,10 +62,11 @@ public class SimpleLiquidContainer extends LiquidContainer {
         return this.content.getQuantity();
     }
 
+    //TODO: 這裡的邏輯需要仔細考慮，特別是關於無限內容和容量的處理。需要確保在模擬模式下不會改變內容，並且在實際執行時正確地處理填充和抽取的邏輯。
     @NonNullDecl
     @Override
     public LiquidFlux fill(LiquidFlux resource, FluxAction action) {
-        LiquidStack resourceStack = resource.getFirstStack();
+        LiquidStack resourceStack = resource.getStack(0);
         if (resourceStack.getQuantity() == Long.MAX_VALUE && isInfiniteContent()) {
             this.content = new LiquidStack(resourceStack.getLiquid(), getContainerCapacity());
             return new LiquidFlux(this.content);
@@ -74,10 +95,11 @@ public class SimpleLiquidContainer extends LiquidContainer {
         return new LiquidFlux(canFill);
     }
 
+    //TODO: 這裡的邏輯需要仔細考慮，特別是關於無限內容和容量的處理。需要確保在模擬模式下不會改變內容，並且在實際執行時正確地處理填充和抽取的邏輯。
     @NonNullDecl
     @Override
     public LiquidFlux drain(LiquidFlux maxDrainResource, FluxAction action) {
-        LiquidStack resourceStack = maxDrainResource.getFirstStack();
+        LiquidStack resourceStack = maxDrainResource.getStack(0);
         if (resourceStack.isEmpty() || this.content.isEmpty() || !this.content.isLiquidEqual(resourceStack.getLiquid())) {
             return new LiquidFlux();
         }

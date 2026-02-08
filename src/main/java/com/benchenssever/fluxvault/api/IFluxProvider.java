@@ -3,21 +3,21 @@ package com.benchenssever.fluxvault.api;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * Interface for objects (like Blocks, Entities, or Parts) that can provide Flux Handlers.
+ * Interface for objects capable of providing specific Flux handlers.
  * <p>
- * This capability provider pattern allows an object to support multiple types of resources
- * (e.g., a machine holding both Liquid and Energy) and expose the appropriate handler dynamically.
+ * Implemented by Blocks, Entities, or Components to expose their resource capabilities
+ * (e.g., a machine that accepts both Liquid and Energy).
  * </p>
  */
 public interface IFluxProvider {
 
     /**
-     * Retrieves a handler for the specified Flux type.
+     * Retrieves the handler for a specific Flux resource type.
      *
-     * @param type The type of handler requested (e.g., {@link FluxType#LIQUID}).
+     * @param type The type of resource requested (e.g., {@link FluxType#LIQUID}).
      * @param <T>  The carrier type.
      * @param <D>  The data type.
-     * @return A handler instance for the requested type, or {@code null} if this provider does not support the given type.
+     * @return The handler instance, or {@code null} if the type is not supported.
      */
     @NullableDecl
     <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(FluxType<T, D> type);

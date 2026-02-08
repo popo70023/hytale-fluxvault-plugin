@@ -1,12 +1,12 @@
 package com.benchenssever.fluxvault.liquid;
 
-import com.benchenssever.fluxvault.api.FluxBundle;
+import com.benchenssever.fluxvault.api.AbstractFlux;
 import com.benchenssever.fluxvault.api.FluxType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiquidFlux extends FluxBundle<LiquidFlux, LiquidStack> {
+public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
 
     public LiquidFlux(LiquidStack... stacks) {
         super(stacks);
@@ -22,13 +22,37 @@ public class LiquidFlux extends FluxBundle<LiquidFlux, LiquidStack> {
     }
 
     @Override
-    public LiquidStack getFirstStack() {
-        for(LiquidStack stack : this.stacks) {
-            if (stack != null && !stack.isEmpty()) {
-                return stack;
-            }
+    public LiquidStack getStack(int index) {
+        LiquidStack stack = super.getStack(index);
+        return stack == null ? LiquidStack.EMPTY : stack;
+    }
+
+    @Override
+    public void setStack(int index, LiquidStack stack) {
+        if (stack == null) {
+            stack = LiquidStack.EMPTY;
         }
-        return null;
+        super.setStack(index, stack);
+    }
+
+    @Override
+    public void addStack(LiquidStack stack) {
+        if (stack != null && stack != LiquidStack.EMPTY) {
+            for (int i = 0; i < stacks.size(); i++) {
+                LiquidStack existingStack = stacks.get(i);
+                if (existingStack != null && existingStack.isLiquidEqual(stack.getLiquid())) {
+                    long combinedQuantity = existingStack.addQuantity(stack.getQuantity());
+                    stacks.set(i, new LiquidStack(stack.getLiquid(), combinedQuantity));
+                    return;
+                }
+            }
+            stacks.add(stack);
+        }
+    }
+
+    @Override
+    public void cleanFlux() {
+        stacks.removeIf(s -> s == null || s == LiquidStack.EMPTY);
     }
 
     @Override
@@ -60,5 +84,10 @@ public class LiquidFlux extends FluxBundle<LiquidFlux, LiquidStack> {
             newStacks.add(s.copy());
         }
         return new LiquidFlux(newStacks);
+    }
+
+    @Override
+    public String toString() {
+        return "LiquidFlux{stacks=" + stacks + '}';
     }
 }

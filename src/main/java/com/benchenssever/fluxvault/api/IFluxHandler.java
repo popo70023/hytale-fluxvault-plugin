@@ -3,9 +3,10 @@ package com.benchenssever.fluxvault.api;
 import javax.annotation.Nonnull;
 
 /**
- * Defines a handler capable of accepting (filling) or providing (draining) Flux resources.
+ * Standard interface for accepting (fill) and extracting (drain) Flux resources.
  * <p>
- * This interface is typically implemented by machines, pipes, or storage blocks.
+ * Implemented by any object that interacts with the logistics system, such as machines,
+ * pipes, or storage containers.
  * </p>
  *
  * @param <T> The carrier type (e.g., LiquidFlux).
@@ -14,51 +15,40 @@ import javax.annotation.Nonnull;
 public interface IFluxHandler<T extends IFlux<T, D>, D> {
 
     /**
-     * Attempts to insert resources into this handler.
+     * Inserts resources into this handler.
      *
-     * @param resource The resource carrier to insert.
-     * @param action   If {@code SIMULATE}, the insertion is only calculated but not performed.
-     * @return The <b>remainder</b> of the resource that could NOT be inserted.
-     * Returns an empty Flux if all resources were accepted.
+     * @param resource The resources to insert.
+     * @param action   The operation mode (SIMULATE or EXECUTE).
+     * @return The <b>remainder</b> that could not be accepted. Returns empty if fully accepted.
      */
     @Nonnull
     T fill(T resource, FluxAction action);
 
     /**
-     * Attempts to extract resources from this handler based on a request template.
-     * <p>
-     * The {@code maxDrainResource} acts as a filter/order form:
-     * <ul>
-     * <li>If it contains specific data, only matching resources are drained.</li>
-     * <li>If it contains a wildcard (e.g., empty liquid), it performs a "blind" drain up to the requested quantity.</li>
-     * </ul>
-     * </p>
+     * Extracts resources from this handler based on a request.
      *
-     * @param maxDrainResource A carrier defining the type (intent) and maximum amount to drain.
-     * @param action           If {@code SIMULATE}, the extraction is only calculated.
-     * @return A carrier containing the resources that were <b>actually extracted</b>.
-     * Returns an empty Flux if nothing could be drained.
+     * @param requestResources A carrier defining the desired resources (filter) and maximum amounts to extract.
+     * @param action           The operation mode (SIMULATE or EXECUTE).
+     * @return The resources <b>actually extracted</b>. Returns empty if nothing was drained.
      */
     @Nonnull
-    T drain(T maxDrainResource, FluxAction action);
+    T drain(T requestResources, FluxAction action);
 
     /**
-     * Defines the mode of operation for Flux interactions.
+     * Operation mode for Flux interactions.
      */
     enum FluxAction {
-        /**
-         * Perform the action and modify the state (actually move resources).
-         */
+        /** Modifies the state (Standard operation). */
         EXECUTE,
-        /**
-         * Calculate the result without modifying any state (prediction/checking).
-         */
+        /** Calculates result without modifying state (Prediction/Check). */
         SIMULATE;
 
+        /** @return True if this is an execution action. */
         public boolean execute() {
             return this == EXECUTE;
         }
 
+        /** @return True if this is a simulation action. */
         public boolean simulate() {
             return this == SIMULATE;
         }

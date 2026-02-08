@@ -1,7 +1,7 @@
 {
     "Group": "fluxvault",
     "Name": "Flux Vault",
-    "Version": "0.1.0",
+    "Version": "0.1.0-SNAPSHOT",
     "Description": "A unified storage framework for fluids, energy, and resources.",
     "Authors": [
         {

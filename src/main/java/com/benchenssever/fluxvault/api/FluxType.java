@@ -6,22 +6,20 @@ import com.benchenssever.fluxvault.liquid.LiquidStack;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 /**
- * Represents the unique identity and type definition for a specific Flux resource system.
+ * Identity token binding a Carrier type (T) to its Data type (D).
  * <p>
- * This class serves as a safe runtime token that binds a Carrier type ({@code T})
- * with its corresponding Data type ({@code D}). It allows for type-safe casting and
- * retrieval of handlers from providers.
+ * Used for safe runtime casting, type comparison, and retrieving specific handlers.
  * </p>
  *
- * @param <T> The type of the Carrier (e.g., {@code LiquidFlux}).
- * @param <D> The type of the Data (e.g., {@code LiquidStack}).
+ * @param <T> The Carrier implementation (e.g., {@code LiquidFlux}).
+ * @param <D> The Data type (e.g., {@code LiquidStack}).
  */
 public final class FluxType<T extends IFlux<T, D>, D> {
 
-    /**
-     * Standard FluxType instance for Liquid resources.
-     */
+    /** Standard type for Liquid resources. */
     public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("LIQUID", LiquidFlux.class, LiquidStack.class);
+
+    /** Standard type for Item resources. */
     public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("ITEM", ItemFlux.class, ItemStack.class);
 
     private final String name;
@@ -35,16 +33,14 @@ public final class FluxType<T extends IFlux<T, D>, D> {
     }
 
     /**
-     * Gets the unique name of this FluxType.
-     *
-     * @return The name identifier.
+     * @return The unique identifier name.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Safely casts a generic IFlux carrier to the specific type {@code T}.
+     * Casts a generic IFlux interface to the concrete carrier type {@code T}.
      *
      * @param flux The carrier to cast.
      * @return The cast carrier.
@@ -58,7 +54,7 @@ public final class FluxType<T extends IFlux<T, D>, D> {
     }
 
     /**
-     * Safely casts a generic object to the specific data type {@code D}.
+     * Casts a generic object to the specific data type {@code D}.
      *
      * @param data The object to cast.
      * @return The cast data object.
@@ -72,10 +68,9 @@ public final class FluxType<T extends IFlux<T, D>, D> {
     }
 
     /**
-     * Casts a wildcard handler to a strictly typed handler associated with this FluxType.
+     * Unchecked cast of a generic handler to the specific type {@code <T, D>}.
      * <p>
-     * This is an unchecked cast used to bridge generic API calls (e.g., from {@link IFluxProvider})
-     * to specific implementations.
+     * Used to bridge generic API calls to specific implementations.
      * </p>
      *
      * @param handler The handler to cast.
