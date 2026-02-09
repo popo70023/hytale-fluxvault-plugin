@@ -6,10 +6,10 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.util.List;
 
-public class SimpleLiquidContainer extends LiquidContainer {
+public class SingleLiquidContainer extends LiquidContainer {
     private LiquidStack content;
 
-    public SimpleLiquidContainer(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
+    public SingleLiquidContainer(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
         super(capacity, capacityType, supportedTags);
         this.content = content;
     }
@@ -71,7 +71,7 @@ public class SimpleLiquidContainer extends LiquidContainer {
         if (isInfiniteContent() && this.content.isEmpty()) {
             if (action.simulate()) resource = resource.copy();
             LiquidStack resourceStack = resource.getStack(0);
-            if (resourceStack.addQuantity(-getContainerCapacity()) == 0) {
+            if (resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit())) == 0) {
                 resource.setStack(0, LiquidStack.EMPTY);
                 resource.cleanFlux();
             } else {
@@ -94,7 +94,7 @@ public class SimpleLiquidContainer extends LiquidContainer {
         long spaceAvailable = getContainerCapacity() - this.content.getQuantity();
         if (spaceAvailable <= 0) return resource;
 
-        long canFill = Math.min(spaceAvailable, resourceStack.getQuantity());
+        long canFill = Math.min(Math.min(spaceAvailable, resourceStack.getQuantity()), resource.getTransferLimit());
 
         if (action.execute()) {
             if (this.content.isEmpty()) {
@@ -136,16 +136,17 @@ public class SimpleLiquidContainer extends LiquidContainer {
         if (requestQuantity <= 0) return new LiquidFlux();
 
         if (isInfiniteContent()) {
+            long toDrain = Math.min(Math.min(requestQuantity, getContainerCapacity()), requestResources.getTransferLimit());
             if (action.execute()) {
-                requestStack.addQuantity(-getContainerCapacity());
+                requestStack.addQuantity(-toDrain);
                 if (requestStack.isEmpty()) requestStack = LiquidStack.EMPTY;
                 requestResources.setStack(targetIndex, requestStack);
                 requestResources.cleanFlux();
             }
-            return new LiquidFlux(new LiquidStack(this.content.getLiquid(), Math.min(requestQuantity, getContainerCapacity())));
+            return new LiquidFlux(new LiquidStack(this.content.getLiquid(), toDrain));
         }
 
-        long toDrain = Math.min(requestQuantity, this.content.getQuantity());
+        long toDrain = Math.min(Math.min(requestQuantity, this.content.getQuantity()), requestResources.getTransferLimit());
         LiquidStack stack = new LiquidStack(this.content.getLiquid(), toDrain);
         if (action.execute() && toDrain > 0) {
             this.content.addQuantity(-toDrain);

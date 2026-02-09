@@ -1,6 +1,6 @@
 package com.benchenssever.fluxvault.liquid;
 
-import com.benchenssever.fluxvault.registry.LiquidRegistry;
+import com.benchenssever.fluxvault.registry.Liquids;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -10,8 +10,8 @@ import java.util.Objects;
 public class LiquidStack {
     public final static LiquidStack EMPTY = new LiquidStack();
     public static final BuilderCodec<LiquidStack> CODEC = BuilderCodec.builder(LiquidStack.class, LiquidStack::new)
-            .append(new KeyedCodec<>("liquidId", Codec.STRING), LiquidStack::setLiquidId, LiquidStack::getLiquidId).add()
-            .append(new KeyedCodec<>("quantity", Codec.LONG), LiquidStack::setQuantity, LiquidStack::getQuantity).add()
+            .append(new KeyedCodec<>("LiquidId", Codec.STRING), LiquidStack::setLiquidId, LiquidStack::getLiquidId).add()
+            .append(new KeyedCodec<>("Quantity", Codec.LONG), LiquidStack::setQuantity, LiquidStack::getQuantity).add()
             .build();
     private String liquidId;
     private long quantity;
@@ -76,7 +76,7 @@ public class LiquidStack {
     }
 
     private void refreshLiquidCache() {
-        this.liquid = LiquidRegistry.getLiquid(getLiquidId());
+        this.liquid = Liquids.getLiquid(getLiquidId());
     }
 
     public boolean isEmpty() {
@@ -97,5 +97,10 @@ public class LiquidStack {
     public boolean isLiquidEqual(Liquid resource) {
         if (resource == null) return false;
         return getLiquid().equals(resource);
+    }
+
+    @Override
+    public String toString() {
+        return "LiquidStack{liquid='" + liquidId + "', qty=" + quantity + "}";
     }
 }

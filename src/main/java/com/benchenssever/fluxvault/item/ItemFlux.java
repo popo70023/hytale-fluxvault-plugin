@@ -96,7 +96,7 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
     }
 
     @Override
-    public boolean matcheStack(ItemStack stack, ItemStack reference) {
+    public boolean matchesStack(ItemStack stack, ItemStack reference) {
         return stack.getItem().equals(reference.getItem());
     }
 

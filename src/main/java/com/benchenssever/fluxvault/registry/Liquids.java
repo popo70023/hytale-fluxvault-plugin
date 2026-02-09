@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class LiquidRegistry {
+public class Liquids {
     private static final Map<String, Liquid> REGISTRY = new HashMap<>();
 
     static {
         registerLiquid(Liquid.EMPTY);
+        registerLiquid(Liquid.WATER);
     }
 
     public static void registerLiquid(Liquid liquid) {

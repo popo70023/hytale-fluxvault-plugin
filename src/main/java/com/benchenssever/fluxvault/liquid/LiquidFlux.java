@@ -78,7 +78,7 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
     }
 
     @Override
-    public boolean matcheStack(LiquidStack stack, LiquidStack reference) {
+    public boolean matchesStack(LiquidStack stack, LiquidStack reference) {
         return stack.isLiquidEqual(reference.getLiquid());
     }
 

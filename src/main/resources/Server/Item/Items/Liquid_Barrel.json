@@ -49,7 +49,16 @@
     },
     "BlockSoundSetId": "Wood",
     "Interactions": {
-      "Use": "Simple_Liquid_Container_Interaction"
+      "Use": "Single_Liquid_Container_Interaction"
+    },
+    "BlockEntity": {
+      "Components": {
+        "SingleLiquidContainerComponent": {
+          "Capacity": 10000,
+          "CapacityType": "FINITE",
+          "Tags": []
+        }
+      }
     }
   },
   "ResourceTypes": [

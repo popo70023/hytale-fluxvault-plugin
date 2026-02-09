@@ -12,21 +12,25 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-public class SimpleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
-    public static final BuilderCodec<SimpleLiquidContainerComponent> CODEC = BuilderCodec.builder(SimpleLiquidContainerComponent.class, SimpleLiquidContainerComponent::new)
-            .append(new KeyedCodec<>("content", LiquidStack.CODEC), SimpleLiquidContainerComponent::setContent, SimpleLiquidContainerComponent::getContent).add()
-            .append(new KeyedCodec<>("capacity", Codec.LONG), SimpleLiquidContainerComponent::setCapacity, SimpleLiquidContainerComponent::getCapacity).add()
-            .append(new KeyedCodec<>("capacityType", Codec.STRING), SimpleLiquidContainerComponent::setCapacityType, SimpleLiquidContainerComponent::getCapacityType).add()
-            .append(new KeyedCodec<>("tags", Codec.STRING_ARRAY), SimpleLiquidContainerComponent::setSupportedTags, SimpleLiquidContainerComponent::getSupportedTags).add()
+public class SingleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
+    public static final BuilderCodec<SingleLiquidContainerComponent> CODEC = BuilderCodec.builder(SingleLiquidContainerComponent.class, SingleLiquidContainerComponent::new)
+            .append(new KeyedCodec<>("Content", LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent).add()
+            .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity).add()
+            .append(new KeyedCodec<>("CapacityType", Codec.STRING), SingleLiquidContainerComponent::setCapacityType, SingleLiquidContainerComponent::getCapacityType).add()
+            .append(new KeyedCodec<>("Tags", Codec.STRING_ARRAY), SingleLiquidContainerComponent::setSupportedTags, SingleLiquidContainerComponent::getSupportedTags).add()
             .build();
-    private final SimpleLiquidContainer container;
+    private final SingleLiquidContainer container;
 
-    public SimpleLiquidContainerComponent() {
-        this.container = new SimpleLiquidContainer(LiquidStack.EMPTY, 10000, "FINITE", new String[0]);
+    public SingleLiquidContainerComponent() {
+        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, 10000, "FINITE", new String[0]);
     }
 
-    public SimpleLiquidContainerComponent(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
-        this.container = new SimpleLiquidContainer(content, capacity, capacityType, supportedTags);
+    public SingleLiquidContainerComponent(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
+        this.container = new SingleLiquidContainer(content, capacity, capacityType, supportedTags);
+    }
+
+    public SingleLiquidContainerComponent(long capacity, String capacityType, String[] supportedTags) {
+        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, capacity, capacityType, supportedTags);
     }
 
     public LiquidStack getContent() {
@@ -73,7 +77,7 @@ public class SimpleLiquidContainerComponent implements Component<ChunkStore>, IF
     @NullableDecl
     @Override
     public Component<ChunkStore> clone() {
-        return new SimpleLiquidContainerComponent(
+        return new SingleLiquidContainerComponent(
                 this.container.getContainerContent().copy(),
                 this.container.getContainerCapacity(),
                 this.container.getCapacityType(),

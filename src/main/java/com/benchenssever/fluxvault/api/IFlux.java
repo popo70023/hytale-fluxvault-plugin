@@ -25,6 +25,12 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
      */
     int getStackSize();
 
+    long getTransferLimit();
+
+    void setTransferLimit(long limit);
+
+    T limit(long limit);
+
     /**
      * @return A list view of all stacks.
      */
@@ -88,7 +94,7 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
         return getValidator().test(targetData);
     }
 
-    boolean matcheStack(D stack, D reference);
+    boolean matchesStack(D stack, D reference);
 
     /**
      * @return A deep copy of this carrier.
