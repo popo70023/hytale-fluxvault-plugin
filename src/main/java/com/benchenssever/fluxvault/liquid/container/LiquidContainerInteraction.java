@@ -45,7 +45,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
     private static boolean interactByCapsule(Player player, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux, LiquidStack> container) {
         LiquidCapsuleType capsuleType = LiquidCapsuleType.getLiquidCapsuleType(itemInHand);
         if (capsuleType == null) return false;
-        LiquidStack capacity = capsuleType.isEmptyCapsule(itemInHand) ? new LiquidStack(Liquid.EMPTY, capsuleType.getCapacity()) : capsuleType.getLiquidStackInCapsule(itemInHand);
+        LiquidStack capacity = capsuleType.isEmptyCapsule(itemInHand) ? LiquidStack.of(Liquid.EMPTY, capsuleType.getCapacity()) : capsuleType.getLiquidStackInCapsule(itemInHand);
 
         if (capacity.isEmpty()) {
             LiquidFlux extracted = container.drain(new LiquidFlux(capacity), IFluxHandler.FluxAction.SIMULATE);
@@ -98,7 +98,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
                 return;
             }
             player.sendMessage(Message.raw(containerComponent.getContent().toString()));
-            containerComponent.getFluxHandler(FluxType.LIQUID).fill(new LiquidFlux(new LiquidStack("water", 1000)), IFluxHandler.FluxAction.EXECUTE);
+            containerComponent.getFluxHandler(FluxType.LIQUID).fill(new LiquidFlux(LiquidStack.of("water", 1000)), IFluxHandler.FluxAction.EXECUTE);
         }
     }
 

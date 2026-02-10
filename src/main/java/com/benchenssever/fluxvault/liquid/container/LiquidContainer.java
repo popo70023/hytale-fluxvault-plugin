@@ -1,6 +1,7 @@
 package com.benchenssever.fluxvault.liquid.container;
 
-import com.benchenssever.fluxvault.api.IFluxContainer;
+import com.benchenssever.fluxvault.api.AbstractContainer;
+import com.benchenssever.fluxvault.api.CapacityType;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
 
@@ -10,51 +11,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public abstract class LiquidContainer implements IFluxContainer<LiquidFlux, LiquidStack> {
-    protected long capacity;
-    protected CapacityType capacityType;
+public abstract class LiquidContainer extends AbstractContainer<LiquidFlux, LiquidStack> {
     protected Set<String> supportedTags = Set.of();
 
-    protected LiquidContainer(long capacity, String capacityTypeStr, String[] supportedTags) {
-        this.capacity = capacity;
-        try {
-            this.capacityType = CapacityType.valueOf(capacityTypeStr);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            this.capacityType = CapacityType.FINITE;
-        }
+    protected LiquidContainer(String capacityTypeStr, String[] supportedTags) {
+        super(capacityTypeStr);
         this.setSupportedTags(supportedTags);
-    }
-
-    public long getContainerCapacity() {
-        return this.capacityType == CapacityType.INFINITE_CAPACITY ? Long.MAX_VALUE : capacity;
-    }
-
-    public void setContainerCapacity(long capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getCapacityType() {
-        return this.capacityType.name();
-    }
-
-    public void setCapacityType(String capacityTypeStr) {
-        try {
-            this.capacityType = CapacityType.valueOf(capacityTypeStr);
-        } catch (Exception e) {
-            this.capacityType = CapacityType.FINITE;
-        }
     }
 
     public Predicate<LiquidStack> getValidator() {
         return this::canAcceptLiquid;
-    }
-
-    public boolean isInfiniteContent() {
-        return this.capacityType == CapacityType.INFINITE_CONTENT;
-    }
-
-    public boolean isInfiniteCapacity() {
-        return this.capacityType == CapacityType.INFINITE_CAPACITY;
     }
 
     public String[] getSupportedTags() {
@@ -78,12 +44,20 @@ public abstract class LiquidContainer implements IFluxContainer<LiquidFlux, Liqu
         return this.supportedTags.containsAll(liquidTags);
     }
 
-    public void onContentsChanged() {
-    }
+    public abstract static class fixedCapacity extends LiquidContainer {
+        protected long capacity;
 
-    public enum CapacityType {
-        FINITE,
-        INFINITE_CAPACITY,
-        INFINITE_CONTENT
+        public fixedCapacity(long capacity, String capacityTypeStr, String[] supportedTags) {
+            super(capacityTypeStr, supportedTags);
+            this.capacity = capacity;
+        }
+
+        public long getContainerCapacity() {
+            return this.capacityType == CapacityType.INFINITE_CAPACITY ? Long.MAX_VALUE : capacity;
+        }
+
+        public void setContainerCapacity(long capacity) {
+            this.capacity = capacity;
+        }
     }
 }

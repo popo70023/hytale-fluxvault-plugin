@@ -18,6 +18,8 @@ import java.util.function.Predicate;
  * @param <D> The data type.
  */
 public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T, D> {
+    @Nonnull
+    protected Predicate<D> validator = _ -> true;
     private long transferLimit = Long.MAX_VALUE;
 
     @Override
@@ -35,9 +37,6 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         setTransferLimit(limit);
         return (T) this;
     }
-
-    @Nonnull
-    protected Predicate<D> validator = _ -> true;
 
     @Override
     @Nonnull
@@ -102,8 +101,6 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
 
             for (int i = 0; i < stacks.size(); i++) {
                 D current = stacks.get(i);
-                // 這裡的 matches 需要你根據你的 D 類型來定義
-                // 或是依賴子類別覆寫此方法
                 if (matchesStack(current, stack)) {
                     return i;
                 }
@@ -116,6 +113,11 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
             if (index >= 0 && index < stacks.size()) {
                 stacks.set(index, stack);
             }
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return stacks.isEmpty();
         }
 
         @Override
@@ -173,6 +175,11 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
             if (index == 0) {
                 this.content = stack;
             }
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return content == null;
         }
 
         @Override

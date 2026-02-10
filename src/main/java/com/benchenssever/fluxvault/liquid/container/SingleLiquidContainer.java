@@ -6,19 +6,11 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.util.List;
 
-public class SingleLiquidContainer extends LiquidContainer {
+public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
     private LiquidStack content;
 
     public SingleLiquidContainer(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
         super(capacity, capacityType, supportedTags);
-        this.content = content;
-    }
-
-    public LiquidStack getContainerContent() {
-        return this.content;
-    }
-
-    public void setContainerContent(LiquidStack content) {
         this.content = content;
     }
 
@@ -28,13 +20,20 @@ public class SingleLiquidContainer extends LiquidContainer {
     }
 
     @Override
+    public List<LiquidStack> getContents() {
+        return List.of(this.content);
+    }
+
+    @Override
     public LiquidStack getContent(int index) {
-        return this.content;
+        return index == 0 ? content : null;
     }
 
     @Override
     public void setContent(int index, LiquidStack content) {
-        this.content = content;
+        if (index == 0) {
+            this.content = content;
+        }
     }
 
     @Override
@@ -44,17 +43,12 @@ public class SingleLiquidContainer extends LiquidContainer {
 
     @Override
     public int getFirstContentIndex() {
-        return 0;
+        return this.content.isEmpty() ? -1 : 0;
     }
 
     @Override
     public int findContentIndex(LiquidStack content) {
         return this.content.isLiquidEqual(content.getLiquid()) ? 0 : -1;
-    }
-
-    @Override
-    public List<LiquidStack> getContents() {
-        return List.of(this.content);
     }
 
     @Override
@@ -74,8 +68,6 @@ public class SingleLiquidContainer extends LiquidContainer {
             if (resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit())) == 0) {
                 resource.setStack(0, LiquidStack.EMPTY);
                 resource.cleanFlux();
-            } else {
-                resource.setStack(0, resourceStack);
             }
             return resource;
         }
@@ -98,7 +90,7 @@ public class SingleLiquidContainer extends LiquidContainer {
 
         if (action.execute()) {
             if (this.content.isEmpty()) {
-                this.content = new LiquidStack(resourceStack.getLiquid(), canFill);
+                this.content = LiquidStack.of(resourceStack.getLiquid(), canFill);
             } else {
                 this.content.addQuantity(canFill);
             }
@@ -130,8 +122,8 @@ public class SingleLiquidContainer extends LiquidContainer {
         int targetIndex = requestResources.getIndexOf(this.content);
         if (targetIndex == -1) targetIndex = requestResources.getIndexOf(LiquidStack.EMPTY);
         if (targetIndex == -1) return new LiquidFlux();
-        LiquidStack requestStack = requestResources.getStack(targetIndex);
 
+        LiquidStack requestStack = requestResources.getStack(targetIndex);
         long requestQuantity = requestStack.getQuantity();
         if (requestQuantity <= 0) return new LiquidFlux();
 
@@ -143,11 +135,11 @@ public class SingleLiquidContainer extends LiquidContainer {
                 requestResources.setStack(targetIndex, requestStack);
                 requestResources.cleanFlux();
             }
-            return new LiquidFlux(new LiquidStack(this.content.getLiquid(), toDrain));
+            return new LiquidFlux(LiquidStack.of(this.content.getLiquid(), toDrain));
         }
 
         long toDrain = Math.min(Math.min(requestQuantity, this.content.getQuantity()), requestResources.getTransferLimit());
-        LiquidStack stack = new LiquidStack(this.content.getLiquid(), toDrain);
+        LiquidStack stack = LiquidStack.of(this.content.getLiquid(), toDrain);
         if (action.execute() && toDrain > 0) {
             this.content.addQuantity(-toDrain);
             if (this.content.isEmpty()) {

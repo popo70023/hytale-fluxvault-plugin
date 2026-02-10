@@ -6,6 +6,7 @@
 >
 > * **Flux API:** ✅ Finalized
 > * **Liquid Standard:** 🛠️ In Development
+> * **Energy Standard:** 🧪 Experimental (Untested)
 > * **Reference Implementation:** 🛠️ In Development
 
 FluxVault is a **Developer Tool / Library Mod** designed to simplify resource logistics in Hytale modding.
@@ -29,13 +30,18 @@ A flexible, high-performance interface (`IFluxHandler`) for handling resource I/
 * **A Common Language:** Provides a unified way for blocks and items to exchange resources (Liquids, Energy, etc.) if they choose to adopt it.
 * **Simplified Logic:** Developers don't need to write complex pipe logic; just implement the interface and let the API handle the transfer.
 
+### ⚡ Flux Energy (FE)
+A lightweight, standardized energy unit inspired by industry standards (like Forge Energy).
+* **Pure Quantity:** Designed as a simple `long` value wrapper. No complex attributes like voltage or amperage—just raw power.
+* **Universal Compatibility:** Enables seamless power exchange between any mods that utilize this API (e.g., Mod A's generator powering Mod B's machine) without converters.
+
 ### 💧 Advanced Liquid System (Reference Implementation)
 While Hytale natively handles fluids as blocks or bucket items, FluxVault introduces a more flexible **LiquidStack** system (conceptually similar to Minecraft Forge).
 * **Granular Control:** Allows fluids to be stored directly in custom containers **independent of items**, enabling storage in much smaller, precise units (millibuckets).
 * **Fluid Registry:** A standardized method for registering and managing custom fluids.
 
 ### 🛢️ Basic Storage (Demo)
-Includes a simple **Wooden Storage Barrel** as a reference implementation.
+Includes a simple **Liquid Barrel** as a reference implementation.
 * **Example Code:** Demonstrates how to implement `IFluxContainer` for your own custom blocks.
 * **Early Utility:** Acts as a simple standalone liquid storage block for players.
 
@@ -47,7 +53,7 @@ FluxVault serves as a foundational library to speed up your development.
 
 If you are building a machine, tank, or pipe system:
 1.  **Implement `IFluxProvider`:** This exposes your block's inventory capabilities to external systems.
-2.  **Use `FluxType.LIQUID`:** To leverage the pre-built fluid handling logic.
+2.  **Choose a Type:** Use `FluxType.LIQUID` for liquids or `FluxType.ENERGY` for power.
 3.  **Define Rules:** Simply specify if your block allows insertion (`fill`) or extraction (`drain`).
 
 FluxVault handles the backend transfer logic, allowing you to focus on your mod's unique gameplay features.
@@ -63,6 +69,7 @@ FluxVault handles the backend transfer logic, allowing you to focus on your mod'
 >
 > * **Flux API:** ✅ 已定案
 > * **液體標準:** 🛠️ 製作中
+> * **能量標準:** 🧪 實驗性 (未測試)
 > * **參考實作:** 🛠️ 製作中
 
 FluxVault 是一個 **開發者工具/核心庫模組**，旨在簡化 Hytale 模組中的資源物流開發流程。
@@ -86,6 +93,11 @@ FluxVault 是一個 **開發者工具/核心庫模組**，旨在簡化 Hytale �
 * **通用語言:** 為選擇採用此系統的方塊與物品提供了一種交換資源（如液體、能量）的統一方式。
 * **簡化邏輯:** 開發者無需編寫複雜的管線傳輸代碼，只需實作介面，剩下的交給 API 處理。
 
+### ⚡ 通量能量 (Flux Energy / FE)
+一套輕量級、標準化的能量單位（靈感來自 Forge Energy）。
+* **純粹數值:** 設計為單純的 `long` 數值包裝。沒有電壓、安培等複雜屬性，專注於通用性。
+* **通用相容:** 讓使用本 API 的不同模組（例如 A 模組的發電機與 B 模組的機器）能直接互相供電，無需任何轉換器。
+
 ### 💧 進階液體系統 (參考實作)
 Hytale 原生的流體主要以方塊或桶裝物品的形式存在。FluxVault 引入了 **LiquidStack** 概念（類似 Minecraft Forge 的實作），提升了流體處理的靈活性。
 * **更精細的單位:** 允許液體以 **非物品 (Non-item)** 的數據形式直接儲存在容器中，並支援被分割成更小的計量單位（毫桶）進行傳輸與使用。
@@ -104,7 +116,7 @@ FluxVault 的定位是加速您開發流程的基礎庫。
 
 如果您正在構建機器、儲罐或管線系統：
 1.  **實作 `IFluxProvider`:** 讓您的方塊能夠向外部系統宣告其庫存能力。
-2.  **使用 `FluxType.LIQUID`:** 直接利用內建的流體處理邏輯。
+2.  **選擇類型:** 使用 `FluxType.LIQUID` 處理液體，或 `FluxType.ENERGY` 處理電力。
 3.  **定義規則:** 簡單設定您的方塊是否允許注入 (`fill`) 或抽取 (`drain`)。
 
 FluxVault 負責處理後端的傳輸邏輯，讓您可以專心於開發模組獨特的遊戲玩法。

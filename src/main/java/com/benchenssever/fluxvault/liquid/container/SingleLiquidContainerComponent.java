@@ -34,11 +34,11 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
     }
 
     public LiquidStack getContent() {
-        return this.container.getContainerContent();
+        return this.container.getContent(0);
     }
 
     public void setContent(LiquidStack content) {
-        this.container.setContainerContent(content);
+        this.container.setContent(0, content);
     }
 
     public long getCapacity() {
@@ -78,7 +78,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
     @Override
     public Component<ChunkStore> clone() {
         return new SingleLiquidContainerComponent(
-                this.container.getContainerContent().copy(),
+                this.container.getContent(0).copy(),
                 this.container.getContainerCapacity(),
                 this.container.getCapacityType(),
                 this.container.getSupportedTags()

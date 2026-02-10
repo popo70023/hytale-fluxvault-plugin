@@ -1,5 +1,7 @@
 package com.benchenssever.fluxvault.api;
 
+import com.benchenssever.fluxvault.energy.EnergyFlux;
+import com.benchenssever.fluxvault.energy.FluxEnergy;
 import com.benchenssever.fluxvault.item.ItemFlux;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
@@ -25,6 +27,8 @@ public final class FluxType<T extends IFlux<T, D>, D> {
      * Standard type for Item resources.
      */
     public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("ITEM", ItemFlux.class, ItemStack.class);
+
+    public static final FluxType<EnergyFlux, FluxEnergy> FLUX_ENERGY = new FluxType<>("FLUX_ENERGY", EnergyFlux.class, FluxEnergy.class);
 
     private final String name;
     private final Class<T> resourceClass;

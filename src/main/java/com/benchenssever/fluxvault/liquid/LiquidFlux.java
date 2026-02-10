@@ -42,7 +42,7 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
                 LiquidStack existingStack = stacks.get(i);
                 if (existingStack != null && existingStack.isLiquidEqual(stack.getLiquid())) {
                     long combinedQuantity = existingStack.addQuantity(stack.getQuantity());
-                    stacks.set(i, new LiquidStack(stack.getLiquid(), combinedQuantity));
+                    stacks.set(i, LiquidStack.of(stack.getLiquid(), combinedQuantity));
                     return;
                 }
             }
@@ -64,17 +64,6 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
             }
         }
         return allQuantity;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        if (this.stacks.isEmpty()) return true;
-
-        for (LiquidStack s : this.stacks) {
-            if (!s.isEmpty()) return false;
-        }
-
-        return true;
     }
 
     @Override

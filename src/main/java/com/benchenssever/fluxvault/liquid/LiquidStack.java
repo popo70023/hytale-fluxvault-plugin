@@ -29,16 +29,24 @@ public class LiquidStack {
         this.quantity = liquidStack.getQuantity();
     }
 
-    public LiquidStack(String liquidId, long quantity) {
+    private LiquidStack(String liquidId, long quantity) {
         this.liquidId = liquidId;
         this.quantity = Math.max(0, quantity);
         refreshLiquidCache();
     }
 
-    public LiquidStack(Liquid liquid, long quantity) {
-        this.liquidId = liquid.liquidID();
-        this.liquid = liquid;
-        this.quantity = Math.max(0, quantity);
+    public static LiquidStack of(String liquidId, long quantity) {
+        if (liquidId == null || (Liquid.EMPTY_ID.equals(liquidId) && quantity <= 0)) {
+            return EMPTY;
+        }
+        return new LiquidStack(liquidId, quantity);
+    }
+
+    public static LiquidStack of(Liquid liquid, long quantity) {
+        if (liquid == null || (liquid.equals(Liquid.EMPTY) && quantity <= 0)) {
+            return EMPTY;
+        }
+        return of(liquid.liquidID(), quantity);
     }
 
     public String getLiquidId() {
