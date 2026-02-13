@@ -98,7 +98,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
                 return;
             }
             player.sendMessage(Message.raw(containerComponent.getContent().toString()));
-            containerComponent.getFluxHandler(FluxType.LIQUID).fill(new LiquidFlux(LiquidStack.of("water", 1000)), IFluxHandler.FluxAction.EXECUTE);
+            containerComponent.getFluxHandler(FluxType.LIQUID).fill(new LiquidFlux(LiquidStack.of("Fluid_Water", 1000)), IFluxHandler.FluxAction.EXECUTE);
         }
     }
 

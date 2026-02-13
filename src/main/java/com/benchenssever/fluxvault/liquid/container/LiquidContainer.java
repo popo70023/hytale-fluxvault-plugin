@@ -12,36 +12,36 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public abstract class LiquidContainer extends AbstractContainer<LiquidFlux, LiquidStack> {
-    protected Set<String> supportedTags = Set.of();
+    protected Set<String> acceptedHazards = Set.of();
 
-    protected LiquidContainer(String capacityTypeStr, String[] supportedTags) {
+    protected LiquidContainer(String capacityTypeStr, String[] acceptedHazards) {
         super(capacityTypeStr);
-        this.setSupportedTags(supportedTags);
+        this.setAcceptedHazards(acceptedHazards);
     }
 
     public Predicate<LiquidStack> getValidator() {
         return this::canAcceptLiquid;
     }
 
-    public String[] getSupportedTags() {
-        return this.supportedTags.toArray(String[]::new);
+    public String[] getAcceptedHazards() {
+        return this.acceptedHazards.toArray(String[]::new);
     }
 
-    public void setSupportedTags(String[] supportedTags) {
-        if (supportedTags == null) {
-            this.supportedTags = Collections.emptySet();
+    public void setAcceptedHazards(String[] acceptedHazards) {
+        if (acceptedHazards == null) {
+            this.acceptedHazards = Collections.emptySet();
             return;
         }
-        this.supportedTags = Set.copyOf(new HashSet<>(Arrays.asList(supportedTags)));
+        this.acceptedHazards = Set.copyOf(new HashSet<>(Arrays.asList(acceptedHazards)));
     }
 
     public boolean canAcceptLiquid(LiquidStack resource) {
         if (resource.isEmpty()) return false;
 
-        Set<String> liquidTags = resource.getLiquid().tags();
+        Set<String> liquidTags = resource.getLiquid().getHazards();
         if (liquidTags.isEmpty()) return true;
 
-        return this.supportedTags.containsAll(liquidTags);
+        return this.acceptedHazards.containsAll(liquidTags);
     }
 
     public abstract static class fixedCapacity extends LiquidContainer {

@@ -1,6 +1,5 @@
 package com.benchenssever.fluxvault.liquid;
 
-import com.benchenssever.fluxvault.registry.Liquids;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -46,7 +45,7 @@ public class LiquidStack {
         if (liquid == null || (liquid.equals(Liquid.EMPTY) && quantity <= 0)) {
             return EMPTY;
         }
-        return of(liquid.liquidID(), quantity);
+        return of(liquid.getId(), quantity);
     }
 
     public String getLiquidId() {
@@ -84,12 +83,13 @@ public class LiquidStack {
     }
 
     private void refreshLiquidCache() {
-        this.liquid = Liquids.getLiquid(getLiquidId());
+        this.liquid = Liquid.LIQUIDS.getAsset(this.liquidId);
+        if (this.liquid == null) this.liquid = Liquid.EMPTY;
     }
 
     public boolean isEmpty() {
         if (this == EMPTY) return true;
-        return getLiquidId().equals(Liquid.EMPTY.liquidID()) || getQuantity() <= 0;
+        return getLiquidId().equals(Liquid.EMPTY.getId()) || getQuantity() <= 0;
     }
 
     public LiquidStack copy() {

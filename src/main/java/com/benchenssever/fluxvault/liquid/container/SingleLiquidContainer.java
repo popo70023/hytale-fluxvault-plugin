@@ -9,8 +9,8 @@ import java.util.List;
 public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
     private LiquidStack content;
 
-    public SingleLiquidContainer(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
-        super(capacity, capacityType, supportedTags);
+    public SingleLiquidContainer(LiquidStack content, long capacity, String capacityType, String[] acceptedHazards) {
+        super(capacity, capacityType, acceptedHazards);
         this.content = content;
     }
 

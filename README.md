@@ -47,6 +47,68 @@ Includes a simple **Liquid Barrel** as a reference implementation.
 
 ---
 
+## 🛠️ JSON Configuration (Data-Driven)
+
+FluxVault allows you to register liquids and attach storage capabilities to blocks purely through JSON, without writing Java code.
+
+### 1. Registering Custom Liquids
+To register a new liquid, place a JSON file in your asset directory:
+**Path:** `assets/[your_mod]/Server/Item/Liquid/[liquid_name].json`
+
+```json
+{
+  "Id": "your_mod:acid",
+  "Hazards": ["corrosive", "toxic"]
+}
+```
+* **Id:** Unique identifier for the liquid.
+
+* **Hazards:** An array of strings defining the liquid's traits (e.g., "hot", "corrosive"). Containers can filter based on these tags.
+
+### 2. Adding Storage to Blocks
+   You can add liquid or energy storage to any block by adding components to the BlockEntity section of your block's JSON definition.
+
+#### 🛢️ Liquid Container Component
+```JSON
+"BlockEntity": {
+  "Components": {
+    "SingleLiquidContainerComponent": {
+      "Capacity": 10000,
+      "CapacityType": "FINITE",
+      "AcceptedHazards": ["hot", "corrosive"]
+    }
+  }
+}
+```
+* **Capacity:** Maximum amount of liquid (in mB).
+
+* **CapacityType:**
+
+  * `FINITE`: Standard storage with a limit.
+
+  * `INFINITE_CAPACITY`: Accepts infinite liquid (void/trash can).
+
+  * `INFINITE_CONTENT`: Provides infinite liquid (creative source).
+
+* **AcceptedHazards:** Whitelist of hazard tags this container can store. If empty, it accepts safe liquids only.
+
+#### ⚡ Energy Container Component
+```JSON
+"BlockEntity": {
+  "Components": {
+    "SingleEnergyContainerComponent": {
+      "Capacity": 50000,
+      "CapacityType": "FINITE"
+    }
+  }
+}
+```
+* **Capacity:** Maximum energy storage (FE).
+
+* **CapacityType:** Same as liquid (`FINITE`, `INFINITE_CAPACITY`, `INFINITE_CONTENT`).
+
+---
+
 ## 👨‍💻 For Developers
 
 FluxVault serves as a foundational library to speed up your development.
@@ -107,6 +169,66 @@ Hytale 原生的流體主要以方塊或桶裝物品的形式存在。FluxVault 
 包含一個簡單的 **儲液木桶** 作為參考實作。
 * **範例代碼:** 展示如何為您的自定義方塊實作 `IFluxContainer`。
 * **早期實用性:** 對玩家而言，它也是一個獨立且實用的簡易液體儲存方塊。
+
+---
+
+## 🛠️ JSON 配置指南 (數據驅動)
+FluxVault 允許您完全透過 JSON 來註冊新液體或為方塊添加儲存功能，無需編寫 Java 代碼。
+
+### 1. 註冊自定義液體
+   若要註冊新液體，請將 JSON 檔案放置於資源包路徑：
+   **路徑:** `Asset.zip/Server/Item/Liquid/[liquid_name].json`
+
+```JSON
+{
+"Id": "your_mod:acid",
+"Hazards": ["corrosive", "toxic"]
+}
+```
+* **Id:** 液體的唯一識別碼。
+
+* **Hazards:** 定義液體特性的字串陣列 (如 "hot", "corrosive")。容器可根據這些標籤決定是否容納該液體。
+
+### 2. 為方塊添加儲存功能
+   您可以在方塊定義 JSON 的 `BlockEntity` 區塊中加入 `Components` 來啟用功能。
+
+#### 🛢️ 液體容器組件 (Liquid Container)
+```JSON
+"BlockEntity": {
+  "Components": {
+    "SingleLiquidContainerComponent": {
+      "Capacity": 10000,
+      "CapacityType": "FINITE",
+      "AcceptedHazards": ["hot", "corrosive"]
+    }
+  }
+}
+```
+* **Capacity:** 最大容量 (mB)。
+
+* **CapacityType:** 容器行為類型。
+
+  * `FINITE`: 有限容量 (標準儲罐)。
+
+  * `INFINITE_CAPACITY`: 無限容量 (虛空垃圾桶)。
+
+  * `INFINITE_CONTENT`: 無限內容 (創造模式無限水源)。
+
+* **AcceptedHazards:** 容許的危害標籤白名單。若為空陣列，則只能裝載無危害的液體。
+
+#### ⚡ 能量容器組件 (Energy Container)
+```JSON
+"BlockEntity": {
+  "Components": {
+    "SingleEnergyContainerComponent": {
+      "Capacity": 50000,
+      "CapacityType": "FINITE"
+    }
+  }
+}
+```
+* **Capacity:** 最大能量儲存 (FE)。
+* **CapacityType:** 同液體容器 (`FINITE`, `INFINITE_CAPACITY`, `INFINITE_CONTENT`)。
 
 ---
 

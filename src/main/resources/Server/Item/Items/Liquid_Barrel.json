@@ -56,7 +56,7 @@
         "SingleLiquidContainerComponent": {
           "Capacity": 10000,
           "CapacityType": "FINITE",
-          "Tags": []
+          "AcceptedHazards": []
         }
       }
     }

@@ -17,7 +17,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
             .append(new KeyedCodec<>("Content", LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent).add()
             .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity).add()
             .append(new KeyedCodec<>("CapacityType", Codec.STRING), SingleLiquidContainerComponent::setCapacityType, SingleLiquidContainerComponent::getCapacityType).add()
-            .append(new KeyedCodec<>("Tags", Codec.STRING_ARRAY), SingleLiquidContainerComponent::setSupportedTags, SingleLiquidContainerComponent::getSupportedTags).add()
+            .append(new KeyedCodec<>("AcceptedHazards", Codec.STRING_ARRAY), SingleLiquidContainerComponent::setAcceptedHazards, SingleLiquidContainerComponent::getAcceptedHazards).add()
             .build();
     private final SingleLiquidContainer container;
 
@@ -57,12 +57,12 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
         this.container.setCapacityType(capacityType);
     }
 
-    public String[] getSupportedTags() {
-        return this.container.getSupportedTags();
+    public String[] getAcceptedHazards() {
+        return this.container.getAcceptedHazards();
     }
 
-    public void setSupportedTags(String[] supportedTags) {
-        this.container.setSupportedTags(supportedTags);
+    private void setAcceptedHazards(String[] supportedTags) {
+        this.container.setAcceptedHazards(supportedTags);
     }
 
     @NullableDecl
@@ -81,7 +81,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
                 this.container.getContent(0).copy(),
                 this.container.getContainerCapacity(),
                 this.container.getCapacityType(),
-                this.container.getSupportedTags()
+                this.container.getAcceptedHazards()
         );
     }
 }
