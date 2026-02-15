@@ -13,11 +13,15 @@ public class FluxAssetRegistry {
             .setReplaceOnRemove(_ -> Liquid.EMPTY)
             .build();
 
+    public static HytaleAssetStore<String, LiquidCapsuleTypeRegistry, IndexedLookupTableAssetMap<String, LiquidCapsuleTypeRegistry>> CAPSULE_TYPE_ASSET_STORE = HytaleAssetStore.builder(LiquidCapsuleTypeRegistry.class, new IndexedLookupTableAssetMap<>(LiquidCapsuleTypeRegistry[]::new))
+            .setPath("Item/Liquid/CapsuleType")
+            .setCodec(LiquidCapsuleTypeRegistry.CODEC)
+            .setKeyFunction(LiquidCapsuleTypeRegistry::getId)
+            .setReplaceOnRemove(_ -> new LiquidCapsuleTypeRegistry())
+            .build();
+
     public static void registerAssets(AssetRegistry assetRegistry) {
         assetRegistry.register(LIQUID_ASSET_STORE);
-    }
-
-    public static void registerMap() {
-        Liquid.LIQUIDS = LIQUID_ASSET_STORE.getAssetMap();
+        assetRegistry.register(CAPSULE_TYPE_ASSET_STORE);
     }
 }

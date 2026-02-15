@@ -83,7 +83,7 @@ public class LiquidStack {
     }
 
     private void refreshLiquidCache() {
-        this.liquid = Liquid.LIQUIDS.getAsset(this.liquidId);
+        this.liquid = Liquid.getLiquidById(this.liquidId);
         if (this.liquid == null) this.liquid = Liquid.EMPTY;
     }
 

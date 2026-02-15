@@ -2,7 +2,6 @@ package com.benchenssever.fluxvault.liquid.container;
 
 import com.benchenssever.fluxvault.api.FluxType;
 import com.benchenssever.fluxvault.api.IFluxHandler;
-import com.benchenssever.fluxvault.liquid.Liquid;
 import com.benchenssever.fluxvault.liquid.LiquidCapsuleType;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
@@ -45,10 +44,10 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
     private static boolean interactByCapsule(Player player, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux, LiquidStack> container) {
         LiquidCapsuleType capsuleType = LiquidCapsuleType.getLiquidCapsuleType(itemInHand);
         if (capsuleType == null) return false;
-        LiquidStack capacity = capsuleType.isEmptyCapsule(itemInHand) ? LiquidStack.of(Liquid.EMPTY, capsuleType.getCapacity()) : capsuleType.getLiquidStackInCapsule(itemInHand);
+        LiquidStack itemContent = capsuleType.getLiquidStackInCapsule(itemInHand);
 
-        if (capacity.isEmpty()) {
-            LiquidFlux extracted = container.drain(new LiquidFlux(capacity), IFluxHandler.FluxAction.SIMULATE);
+        if (itemContent.isEmpty()) {
+            LiquidFlux extracted = container.drain(new LiquidFlux(itemContent), IFluxHandler.FluxAction.SIMULATE);
             LiquidStack extractedStack = extracted.getStack(0);
             ItemStack newItemStack = capsuleType.getCapsuleWithLiquid(extractedStack.getLiquid());
             if (!newItemStack.isEmpty() && !extracted.isEmpty() && extractedStack.getQuantity() == capsuleType.getCapacity()) {
@@ -56,9 +55,9 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
                 return true;
             }
         } else {
-            LiquidFlux acceptedAmount = container.fill(new LiquidFlux(capacity), IFluxHandler.FluxAction.SIMULATE);
-            if (acceptedAmount.getStack(0).isEqual(capacity)) {
-                container.fill(new LiquidFlux(capacity), IFluxHandler.FluxAction.EXECUTE);
+            LiquidFlux remainder = container.fill(new LiquidFlux(itemContent), IFluxHandler.FluxAction.SIMULATE);
+            if (remainder.isEmpty()) {
+                container.fill(new LiquidFlux(itemContent), IFluxHandler.FluxAction.EXECUTE);
                 return true;
             }
         }
@@ -66,7 +65,7 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
         return false;
     }
 
-    public static SingleLiquidContainerComponent GetBlockComponent(Vector3i targetBlock, World world, ComponentType<ChunkStore, SingleLiquidContainerComponent> componentType) {
+    public static SingleLiquidContainerComponent getBlockComponent(Vector3i targetBlock, World world, ComponentType<ChunkStore, SingleLiquidContainerComponent> componentType) {
         ChunkStore chunkStore = world.getChunkStore();
         long chunkIndex = ChunkUtil.indexChunkFromBlock(targetBlock.getX(), targetBlock.getZ());
         BlockComponentChunk blockComponentChunk = chunkStore.getChunkComponent(chunkIndex, BlockComponentChunk.getComponentType());
@@ -92,13 +91,13 @@ public class LiquidContainerInteraction extends SimpleBlockInteraction {
 
         if (player != null) {
             player.sendMessage(Message.raw("Interact with a Liquid Container"));
-            SingleLiquidContainerComponent containerComponent = GetBlockComponent(pos, world, ComponentTypes.SINGLE_LIQUID_CONTAINER);
+            SingleLiquidContainerComponent containerComponent = getBlockComponent(pos, world, ComponentTypes.SINGLE_LIQUID_CONTAINER);
             if (containerComponent == null) {
                 player.sendMessage(Message.raw("NO Liquid Container Component"));
                 return;
             }
+            interactWithContainer(player, context, itemInHand, containerComponent.getFluxHandler(FluxType.LIQUID));
             player.sendMessage(Message.raw(containerComponent.getContent().toString()));
-            containerComponent.getFluxHandler(FluxType.LIQUID).fill(new LiquidFlux(LiquidStack.of("Fluid_Water", 1000)), IFluxHandler.FluxAction.EXECUTE);
         }
     }
 

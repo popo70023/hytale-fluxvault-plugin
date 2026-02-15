@@ -1,5 +1,6 @@
 package com.benchenssever.fluxvault.liquid;
 
+import com.benchenssever.fluxvault.registry.FluxAssetRegistry;
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.codec.AssetBuilderCodec;
 import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
@@ -12,7 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-//TODO: 這個類別的主要目標是定義一種液體類型，包含一個唯一的識別符（liquidID）和一組相關的標籤（hazards）。核心邏輯會在構造函數裡實作，確保它能正確初始化 liquidID 和 hazards，並提供必要的方法來訪問這些屬性。
 public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, Liquid>> {
 
     public static final String EMPTY_ID = "empty";
@@ -21,7 +21,6 @@ public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetM
             .append(new KeyedCodec<>("Hazards", Codec.STRING_ARRAY), Liquid::setTraitsByArrays, Liquid::getHazardsToArrays).add()
             .build();
     public static final Liquid EMPTY = new Liquid();
-    public static IndexedLookupTableAssetMap<String, Liquid> LIQUIDS;
 
     private String liquidID;
     private Set<String> hazards;
@@ -35,6 +34,10 @@ public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetM
     public Liquid(String liquidID, String[] tags) {
         this.liquidID = liquidID;
         this.hazards = Set.of(tags);
+    }
+
+    public static Liquid getLiquidById(String id) {
+        return FluxAssetRegistry.LIQUID_ASSET_STORE.getAssetMap().getAsset(id);
     }
 
     @Override

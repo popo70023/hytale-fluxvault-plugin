@@ -3,6 +3,7 @@ package com.benchenssever.fluxvault;
 import com.benchenssever.fluxvault.liquid.container.LiquidContainerInteraction;
 import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.benchenssever.fluxvault.registry.FluxAssetRegistry;
+import com.benchenssever.fluxvault.registry.LiquidCapsuleTypeRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -12,11 +13,15 @@ import javax.annotation.Nonnull;
 
 public class FluxVaultPlugin extends JavaPlugin {
 
-    public static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     public FluxVaultPlugin(@Nonnull JavaPluginInit init) {
         super(init);
         LOGGER.atInfo().log("Hello from " + this.getName() + " version " + this.getManifest().getVersion().toString());
+    }
+
+    public static HytaleLogger getPluginLogger() {
+        return LOGGER;
     }
 
     @Override
@@ -29,8 +34,7 @@ public class FluxVaultPlugin extends JavaPlugin {
 
     @Override
     protected void start() {
-        super.start();
         LOGGER.atInfo().log("Starting plugin " + this.getName());
-        FluxAssetRegistry.registerMap();
+        LiquidCapsuleTypeRegistry.registerLiquidCapsuleType();
     }
 }

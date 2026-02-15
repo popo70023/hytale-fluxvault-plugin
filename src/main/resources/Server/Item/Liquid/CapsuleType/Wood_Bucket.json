@@ -1,0 +1,17 @@
+{
+  "Id": "Wood_Bucket",
+  "Data": [
+    {
+      "CapsuleId": "Wood_Bucket",
+      "Capacity":1000,
+      "ItemId":"Container_Bucket",
+      "LiquidId":"empty"
+    },
+    {
+      "CapsuleId": "Wood_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Container_Bucket_State_Filled_Water",
+      "LiquidId":"Fluid_Water"
+    }
+  ]
+}
