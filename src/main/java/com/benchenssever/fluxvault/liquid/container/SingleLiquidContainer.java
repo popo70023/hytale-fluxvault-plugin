@@ -58,8 +58,7 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
 
     @NonNullDecl
     @Override
-    public LiquidFlux fill(LiquidFlux resource, FluxAction action) {
-        resource.cleanFlux();
+    public LiquidFlux fill(@NonNullDecl LiquidFlux resource, @NonNullDecl FluxAction action) {
         if (resource.isEmpty() || (isInfiniteContent() && !this.content.isEmpty())) return resource;
 
         if (isInfiniteContent() && this.content.isEmpty()) {
@@ -67,7 +66,6 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
             LiquidStack resourceStack = resource.getStack(0);
             if (resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit())) == 0) {
                 resource.setStack(0, LiquidStack.EMPTY);
-                resource.cleanFlux();
             }
             return resource;
         }
@@ -104,7 +102,6 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
         resourceStack.addQuantity(-canFill);
         if (resourceStack.isEmpty()) {
             resource.setStack(targetIndex, LiquidStack.EMPTY);
-            resource.cleanFlux();
         } else {
             resource.setStack(targetIndex, resourceStack);
         }
@@ -114,8 +111,7 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
 
     @NonNullDecl
     @Override
-    public LiquidFlux drain(LiquidFlux requestResources, FluxAction action) {
-        requestResources.cleanFlux();
+    public LiquidFlux drain(@NonNullDecl LiquidFlux requestResources, @NonNullDecl FluxAction action) {
         if (this.content.isEmpty() || requestResources.isEmpty()) return new LiquidFlux();
         if (!requestResources.matches(this.content)) return new LiquidFlux();
 
@@ -130,10 +126,10 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
         if (isInfiniteContent()) {
             long toDrain = Math.min(Math.min(requestQuantity, getContainerCapacity()), requestResources.getTransferLimit());
             if (action.execute()) {
+                requestStack = LiquidStack.of(this.content.getLiquidId(), requestStack.getQuantity());
                 requestStack.addQuantity(-toDrain);
                 if (requestStack.isEmpty()) requestStack = LiquidStack.EMPTY;
                 requestResources.setStack(targetIndex, requestStack);
-                requestResources.cleanFlux();
             }
             return new LiquidFlux(LiquidStack.of(this.content.getLiquid(), toDrain));
         }
@@ -149,10 +145,10 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
         }
 
         if (action.execute()) {
+            requestStack = LiquidStack.of(stack.getLiquidId(), requestStack.getQuantity());
             requestStack.addQuantity(-toDrain);
             if (requestStack.isEmpty()) {
                 requestResources.setStack(targetIndex, LiquidStack.EMPTY);
-                requestResources.cleanFlux();
             } else {
                 requestResources.setStack(targetIndex, requestStack);
             }

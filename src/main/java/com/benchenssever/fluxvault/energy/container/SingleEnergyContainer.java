@@ -59,7 +59,7 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
 
     @NonNullDecl
     @Override
-    public EnergyFlux fill(EnergyFlux resource, FluxAction action) {
+    public EnergyFlux fill(@NonNullDecl EnergyFlux resource, @NonNullDecl FluxAction action) {
         resource.cleanFlux();
         if (resource.isEmpty()) return resource;
         if (isInfiniteContent() && !this.content.isEmpty()) return resource;
@@ -92,7 +92,7 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
 
     @NonNullDecl
     @Override
-    public EnergyFlux drain(EnergyFlux requestResources, FluxAction action) {
+    public EnergyFlux drain(@NonNullDecl EnergyFlux requestResources, @NonNullDecl FluxAction action) {
         requestResources.cleanFlux();
         if (this.content.isEmpty() || requestResources.isEmpty()) return new EnergyFlux(null);
 

@@ -1,6 +1,6 @@
 package com.benchenssever.fluxvault.api;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * Interface for objects capable of providing specific Flux handlers.
@@ -19,6 +19,6 @@ public interface IFluxProvider {
      * @param <D>  The data type.
      * @return The handler instance, or {@code null} if the type is not supported.
      */
-    @NullableDecl
+    @Nullable
     <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(FluxType<T, D> type);
 }

@@ -57,7 +57,7 @@ public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemSta
 
     @NonNullDecl
     @Override
-    public ItemFlux fill(ItemFlux resource, FluxAction action) {
+    public ItemFlux fill(@NonNullDecl ItemFlux resource, @NonNullDecl FluxAction action) {
         if (resource.isEmpty()) return resource;
 
         List<ItemStack> remainders = new ArrayList<>();
@@ -74,7 +74,7 @@ public class VanillaContainerAdapter implements IFluxContainer<ItemFlux, ItemSta
     //TODO: 這裡的邏輯會比較麻煩，因為要考慮到堆疊優先、空位次之、模擬模式不修改原狀態等等
     @NonNullDecl
     @Override
-    public ItemFlux drain(ItemFlux maxDrainResource, FluxAction action) {
+    public ItemFlux drain(@NonNullDecl ItemFlux maxDrainResource, @NonNullDecl FluxAction action) {
         // 實作從原生箱子找東西並扣除數量的邏輯
         // 類似 fill，如果是 SIMULATE 記得不要真的扣除
         return new ItemFlux(); // 暫位符

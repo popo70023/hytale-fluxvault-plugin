@@ -22,7 +22,7 @@ public interface IFluxHandler<T extends IFlux<T, D>, D> {
      * @return The <b>remainder</b> that could not be accepted. Returns empty if fully accepted.
      */
     @Nonnull
-    T fill(T resource, FluxAction action);
+    T fill(@Nonnull T resource, @Nonnull FluxAction action);
 
     /**
      * Extracts resources from this handler based on a request.
@@ -32,7 +32,7 @@ public interface IFluxHandler<T extends IFlux<T, D>, D> {
      * @return The resources <b>actually extracted</b>. Returns empty if nothing was drained.
      */
     @Nonnull
-    T drain(T requestResources, FluxAction action);
+    T drain(@Nonnull T requestResources, @Nonnull FluxAction action);
 
     /**
      * Operation mode for Flux interactions.

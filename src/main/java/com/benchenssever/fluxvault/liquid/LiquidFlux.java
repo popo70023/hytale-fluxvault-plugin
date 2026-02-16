@@ -37,16 +37,11 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
 
     @Override
     public void addStack(LiquidStack stack) {
-        if (stack != null && stack != LiquidStack.EMPTY) {
-            for (int i = 0; i < stacks.size(); i++) {
-                LiquidStack existingStack = stacks.get(i);
-                if (existingStack != null && existingStack.isLiquidEqual(stack.getLiquid())) {
-                    long combinedQuantity = existingStack.addQuantity(stack.getQuantity());
-                    stacks.set(i, LiquidStack.of(stack.getLiquid(), combinedQuantity));
-                    return;
-                }
-            }
+        int index = this.getIndexOf(stack);
+        if (index == -1) {
             stacks.add(stack);
+        } else {
+            stacks.get(index).addQuantity(stack.getQuantity());
         }
     }
 
