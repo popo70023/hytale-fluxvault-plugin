@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, Liquid>> {
 
-    public static final String EMPTY_ID = "empty";
+    public static final String EMPTY_ID = "Empty";
     public static final AssetBuilderCodec<String, Liquid> CODEC = AssetBuilderCodec.builder(Liquid.class, Liquid::new, Codec.STRING,
                     Liquid::setId, Liquid::getId, Liquid::setAssetData, Liquid::getAssetData)
             .append(new KeyedCodec<>("Hazards", Codec.STRING_ARRAY), Liquid::setTraitsByArrays, Liquid::getHazardsToArrays).add()

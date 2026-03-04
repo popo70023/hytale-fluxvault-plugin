@@ -60,15 +60,13 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
     @NonNullDecl
     @Override
     public EnergyFlux fill(@NonNullDecl EnergyFlux resource, @NonNullDecl FluxAction action) {
-        resource.cleanFlux();
         if (resource.isEmpty()) return resource;
         if (isInfiniteContent() && !this.content.isEmpty()) return resource;
 
         if (isInfiniteContent() && this.content.isEmpty()) {
             if (action.simulate()) resource = resource.copy();
             FluxEnergy resourceStack = resource.getStack(0);
-            if (resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit())) == 0)
-                resource.cleanFlux();
+            resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit()));
             return resource;
         }
 
@@ -85,7 +83,6 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
             resource = resource.copy();
         }
         resource.getStack(0).addQuantity(-canFill);
-        resource.cleanFlux();
 
         return resource;
     }
@@ -93,7 +90,6 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
     @NonNullDecl
     @Override
     public EnergyFlux drain(@NonNullDecl EnergyFlux requestResources, @NonNullDecl FluxAction action) {
-        requestResources.cleanFlux();
         if (this.content.isEmpty() || requestResources.isEmpty()) return new EnergyFlux(null);
 
         FluxEnergy requestStack = requestResources.getStack(0);
@@ -104,7 +100,6 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
             long toDrain = Math.min(Math.min(requestQuantity, getContainerCapacity()), requestResources.getTransferLimit());
             if (action.execute()) {
                 requestStack.addQuantity(-toDrain);
-                requestResources.cleanFlux();
             }
             return new EnergyFlux(FluxEnergy.of(toDrain));
         }

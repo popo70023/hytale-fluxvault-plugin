@@ -26,13 +26,14 @@ public class EnergyFlux extends AbstractFlux.Packet<EnergyFlux, FluxEnergy> {
     }
 
     @Override
-    public void cleanFlux() {
-        if (this.content.getQuantity() <= 0) content = null;
+    public long getAllQuantity() {
+        return content.getQuantity();
     }
 
     @Override
-    public long getAllQuantity() {
-        return content.getQuantity();
+    public boolean isEmpty() {
+        if (content == null) return true;
+        return content.isEmpty();
     }
 
     @Override

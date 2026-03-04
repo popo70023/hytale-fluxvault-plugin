@@ -25,8 +25,8 @@ public class LiquidCapsuleTypeRegistry implements JsonAssetWithMap<String, Index
     private AssetExtraInfo.Data assetData;
 
     public static void registerLiquidCapsuleType() {
-        Collection<LiquidCapsuleTypeRegistry> CapsuleType = FluxAssetRegistry.CAPSULE_TYPE_ASSET_STORE.getAssetMap().getAssetMap().values();
-        for (LiquidCapsuleTypeRegistry capsuleType : CapsuleType) {
+        Collection<LiquidCapsuleTypeRegistry> capsuleTypeData = FluxAssetRegistry.CAPSULE_TYPE_ASSET_STORE.getAssetMap().getAssetMap().values();
+        for (LiquidCapsuleTypeRegistry capsuleType : capsuleTypeData) {
             for (Data data : capsuleType.getData()) {
                 LiquidCapsuleType.registerItemToCapsule(data.capsuleId, data.capacity, data.itemId, data.liquidId);
             }

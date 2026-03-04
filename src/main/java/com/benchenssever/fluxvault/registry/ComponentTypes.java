@@ -11,7 +11,7 @@ public class ComponentTypes {
     public static ComponentType<ChunkStore, SingleEnergyContainerComponent> SINGLE_ENERGY_CONTAINER;
 
     public static void registerChunkStore(ComponentRegistryProxy<ChunkStore> Registry) {
-        SINGLE_LIQUID_CONTAINER = Registry.registerComponent(SingleLiquidContainerComponent.class, "SingleLiquidContainerComponent", SingleLiquidContainerComponent.CODEC);
-        SINGLE_ENERGY_CONTAINER = Registry.registerComponent(SingleEnergyContainerComponent.class, "SingleEnergyContainerComponent", SingleEnergyContainerComponent.CODEC);
+        SINGLE_LIQUID_CONTAINER = Registry.registerComponent(SingleLiquidContainerComponent.class, SingleLiquidContainerComponent.ID, SingleLiquidContainerComponent.CODEC);
+        SINGLE_ENERGY_CONTAINER = Registry.registerComponent(SingleEnergyContainerComponent.class, SingleEnergyContainerComponent.ID, SingleEnergyContainerComponent.CODEC);
     }
 }

@@ -5,14 +5,17 @@ import com.benchenssever.fluxvault.api.IFlux;
 import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.api.IFluxProvider;
 import com.benchenssever.fluxvault.energy.FluxEnergy;
+import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 public class SingleEnergyContainerComponent implements Component<ChunkStore>, IFluxProvider {
+    public static final String ID = "SingleEnergyContainerComponent";
     public static final BuilderCodec<SingleEnergyContainerComponent> CODEC = BuilderCodec.builder(SingleEnergyContainerComponent.class, SingleEnergyContainerComponent::new)
             .append(new KeyedCodec<>("Content", FluxEnergy.CODEC), SingleEnergyContainerComponent::setContent, SingleEnergyContainerComponent::getContent).add()
             .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleEnergyContainerComponent::setCapacity, SingleEnergyContainerComponent::getCapacity).add()
@@ -30,6 +33,10 @@ public class SingleEnergyContainerComponent implements Component<ChunkStore>, IF
 
     public SingleEnergyContainerComponent(long capacity, String capacityType) {
         this.container = new SingleEnergyContainer(FluxEnergy.of(0), capacity, capacityType);
+    }
+
+    public static ComponentType<ChunkStore, SingleEnergyContainerComponent> getComponentType() {
+        return ComponentTypes.SINGLE_ENERGY_CONTAINER;
     }
 
     public FluxEnergy getContent() {

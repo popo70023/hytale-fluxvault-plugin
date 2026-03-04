@@ -43,34 +43,18 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
     }
 
     @Override
-    public ItemStack getStack(int index) {
-        ItemStack stack = super.getStack(index);
-        return stack == null ? ItemStack.EMPTY : stack;
-    }
-
-    @Override
-    public void setStack(int index, ItemStack stack) {
-        if (stack == null) {
-            stack = ItemStack.EMPTY;
-        }
-        super.setStack(index, stack);
-    }
-
-    @Override
     public FluxType<ItemFlux, ItemStack> getFluxType() {
         return FluxType.ITEM;
     }
 
-    //TODO: Implement setStack and addStack to handle merging and stacking logic according to Hytale's item mechanics.
     @Override
     public void addStack(ItemStack stack) {
-
-    }
-
-    //TODO: Implement cleanFlux to remove null or empty stacks from the internal list, ensuring the flux remains compact and efficient.
-    @Override
-    public void cleanFlux() {
-
+        int index = this.getIndexOf(stack);
+        if (index == -1) {
+            stacks.add(stack);
+        } else {
+            stacks.get(index).withQuantity(stacks.get(index).getQuantity() + stack.getQuantity());
+        }
     }
 
     @Override
@@ -89,7 +73,8 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
         if (stacks.isEmpty()) return true;
 
         for (ItemStack s : stacks) {
-            if (!s.isEmpty()) return false;
+            if (s == null) continue;
+            if (!s.isEmpty() || s.getQuantity() > 0) return false;
         }
 
         return true;

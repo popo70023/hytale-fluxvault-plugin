@@ -48,7 +48,7 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
 
     @Override
     public int findContentIndex(LiquidStack content) {
-        return this.content.isLiquidEqual(content.getLiquid()) ? 0 : -1;
+        return this.content.isLiquidEqual(content.getLiquid()) && this.content.getQuantity() < getContainerCapacity() ? 0 : -1;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SingleLiquidContainer extends LiquidContainer.fixedCapacity {
         }
 
         LiquidStack resourceStack = resource.getStack(targetIndex);
-        if (resourceStack.isEmpty() || !canAcceptLiquid(resourceStack)) {
+        if (resourceStack.isEmpty() || !getValidator().test(resourceStack)) {
             return resource;
         }
 

@@ -1,0 +1,7 @@
+{
+  "Id": "Milk",
+  "TranslationProperties": {
+    "Name": "server.items.Fluid_Milk.name"
+  },
+  "Hazards": []
+}

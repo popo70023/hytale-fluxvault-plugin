@@ -49,7 +49,35 @@
     },
     "BlockSoundSetId": "Wood",
     "Interactions": {
-      "Use": "Single_Liquid_Container_Interaction"
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "FillLiquidContainer",
+            "SimulateOnly": true,
+            "Next": {
+              "Type": "FillLiquidContainer",
+              "Effects": {
+                "ClearSoundEventOnFinish": true,
+                "LocalSoundEventId": "SFX_Water_MoveOut"
+              }
+            },
+            "Failed": {
+              "Type": "DrainLiquidContainer",
+              "SimulateOnly": true,
+              "Next": {
+                "Type": "DrainLiquidContainer",
+                "Effects": {
+                  "ClearSoundEventOnFinish": true,
+                  "LocalSoundEventId": "SFX_Water_MoveIn"
+                }
+              },
+              "Failed": {
+                "Type": "OpenSingleLiquidContainer"
+              }
+            }
+          }
+        ]
+      }
     },
     "BlockEntity": {
       "Components": {

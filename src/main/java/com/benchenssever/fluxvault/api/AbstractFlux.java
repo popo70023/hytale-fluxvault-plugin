@@ -116,11 +116,6 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         }
 
         @Override
-        public boolean isEmpty() {
-            return stacks.isEmpty();
-        }
-
-        @Override
         public Iterator<D> iterator() {
             return stacks.iterator();
         }
@@ -175,11 +170,6 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
             if (index == 0) {
                 this.content = stack;
             }
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return content == null;
         }
 
         @Override

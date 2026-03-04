@@ -74,4 +74,10 @@ public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T
     default Predicate<D> getValidator() {
         return _ -> true;
     }
+
+    enum CapacityType {
+        FINITE,
+        INFINITE_CAPACITY,
+        INFINITE_CONTENT
+    }
 }

@@ -1,0 +1,29 @@
+{
+  "Id": "Ancient_Bucket",
+  "Data": [
+    {
+      "CapsuleId": "Ancient_Bucket",
+      "Capacity":1000,
+      "ItemId":"Deco_Bucket",
+      "LiquidId":"Empty"
+    },
+    {
+      "CapsuleId": "Ancient_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Deco_Bucket_State_Filled_Water",
+      "LiquidId":"Water"
+    },
+    {
+      "CapsuleId": "Ancient_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Deco_Bucket_State_Filled_Milk",
+      "LiquidId":"Milk"
+    },
+    {
+      "CapsuleId": "Ancient_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Deco_Bucket_State_Filled_Mosshorn_Milk",
+      "LiquidId":"Mosshorn_Milk"
+    }
+  ]
+}

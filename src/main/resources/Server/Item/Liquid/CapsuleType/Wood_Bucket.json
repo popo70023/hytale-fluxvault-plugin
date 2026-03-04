@@ -5,13 +5,25 @@
       "CapsuleId": "Wood_Bucket",
       "Capacity":1000,
       "ItemId":"Container_Bucket",
-      "LiquidId":"empty"
+      "LiquidId":"Empty"
     },
     {
       "CapsuleId": "Wood_Bucket",
       "Capacity":1000,
       "ItemId":"*Container_Bucket_State_Filled_Water",
-      "LiquidId":"Fluid_Water"
+      "LiquidId":"Water"
+    },
+    {
+      "CapsuleId": "Wood_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Container_Bucket_State_Filled_Milk",
+      "LiquidId":"Milk"
+    },
+    {
+      "CapsuleId": "Wood_Bucket",
+      "Capacity":1000,
+      "ItemId":"*Container_Bucket_State_Filled_Mosshorn_Milk",
+      "LiquidId":"Mosshorn_Milk"
     }
   ]
 }

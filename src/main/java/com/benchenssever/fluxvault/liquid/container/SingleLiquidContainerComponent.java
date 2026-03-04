@@ -5,14 +5,17 @@ import com.benchenssever.fluxvault.api.IFlux;
 import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.api.IFluxProvider;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
+import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 public class SingleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
+    public static final String ID = "SingleLiquidContainerComponent";
     public static final BuilderCodec<SingleLiquidContainerComponent> CODEC = BuilderCodec.builder(SingleLiquidContainerComponent.class, SingleLiquidContainerComponent::new)
             .append(new KeyedCodec<>("Content", LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent).add()
             .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity).add()
@@ -31,6 +34,10 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
 
     public SingleLiquidContainerComponent(long capacity, String capacityType, String[] supportedTags) {
         this.container = new SingleLiquidContainer(LiquidStack.EMPTY, capacity, capacityType, supportedTags);
+    }
+
+    public static ComponentType<ChunkStore, SingleLiquidContainerComponent> getComponentType() {
+        return ComponentTypes.SINGLE_LIQUID_CONTAINER;
     }
 
     public LiquidStack getContent() {
@@ -78,10 +85,10 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
     @Override
     public Component<ChunkStore> clone() {
         return new SingleLiquidContainerComponent(
-                this.container.getContent(0).copy(),
-                this.container.getContainerCapacity(),
-                this.container.getCapacityType(),
-                this.container.getAcceptedHazards()
+                this.getContent().copy(),
+                this.getCapacity(),
+                this.getCapacityType(),
+                this.getAcceptedHazards()
         );
     }
 }

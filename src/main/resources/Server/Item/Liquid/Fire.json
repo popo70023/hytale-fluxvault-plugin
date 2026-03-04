@@ -1,0 +1,7 @@
+{
+  "Id": "Fire",
+  "TranslationProperties": {
+    "Name": "server.items.Fluid_Fire.name"
+  },
+  "Hazards": ["Molten","Gaseous"]
+}

@@ -1,0 +1,7 @@
+{
+  "Id": "Lava",
+  "TranslationProperties": {
+    "Name": "server.items.Fluid_Lava.name"
+  },
+  "Hazards": ["Molten"]
+}

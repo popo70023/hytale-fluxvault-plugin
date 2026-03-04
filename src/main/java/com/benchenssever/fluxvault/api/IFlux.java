@@ -56,12 +56,6 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
     void addStack(D stack);
 
     /**
-     * Removes all empty stacks from the payload.
-     * Useful for compacting the list after modifications.
-     */
-    void cleanFlux();
-
-    /**
      * @return The total quantity of all data combined.
      */
     long getAllQuantity();

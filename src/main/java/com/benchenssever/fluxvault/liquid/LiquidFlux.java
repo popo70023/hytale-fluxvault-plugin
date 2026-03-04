@@ -22,20 +22,6 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
     }
 
     @Override
-    public LiquidStack getStack(int index) {
-        LiquidStack stack = super.getStack(index);
-        return stack == null ? LiquidStack.EMPTY : stack;
-    }
-
-    @Override
-    public void setStack(int index, LiquidStack stack) {
-        if (stack == null) {
-            stack = LiquidStack.EMPTY;
-        }
-        super.setStack(index, stack);
-    }
-
-    @Override
     public void addStack(LiquidStack stack) {
         int index = this.getIndexOf(stack);
         if (index == -1) {
@@ -43,11 +29,6 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
         } else {
             stacks.get(index).addQuantity(stack.getQuantity());
         }
-    }
-
-    @Override
-    public void cleanFlux() {
-        stacks.removeIf(s -> s == null || s == LiquidStack.EMPTY);
     }
 
     @Override
@@ -59,6 +40,18 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
             }
         }
         return allQuantity;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        if (stacks.isEmpty()) return true;
+
+        for (LiquidStack s : stacks) {
+            if (s == null) continue;
+            if (!s.isEmpty() || s.getQuantity() > 0) return false;
+        }
+
+        return true;
     }
 
     @Override

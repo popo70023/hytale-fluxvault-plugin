@@ -1,7 +1,6 @@
 package com.benchenssever.fluxvault.liquid.container;
 
 import com.benchenssever.fluxvault.api.AbstractContainer;
-import com.benchenssever.fluxvault.api.CapacityType;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
 
