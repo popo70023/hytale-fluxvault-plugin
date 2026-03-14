@@ -4,7 +4,6 @@ import com.benchenssever.fluxvault.api.FluxType;
 import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.liquid.LiquidCapsuleType;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
-import com.benchenssever.fluxvault.liquid.LiquidStack;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -37,16 +36,16 @@ public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NullableDecl ItemStack itemInHand, @NonNullDecl Vector3i pos, @NonNullDecl CooldownHandler cooldownHandler) {
         Ref<EntityStore> playerRef = context.getEntity();
         Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
-        IFluxHandler<LiquidFlux, LiquidStack> fluxHandler = InteractionUtil.getFluxHandler(world, pos, FluxType.LIQUID);
+        IFluxHandler<LiquidFlux> handler = InteractionUtil.getFluxHandler(world, pos, FluxType.LIQUID);
         InteractionSyncData state = context.getState();
         IFluxHandler.FluxAction action = simulateOnly ? IFluxHandler.FluxAction.SIMULATE : IFluxHandler.FluxAction.EXECUTE;
 
-        if (player == null || itemInHand == null || itemInHand.isEmpty() || fluxHandler == null) {
+        if (player == null || itemInHand == null || itemInHand.isEmpty() || handler == null) {
             state.state = InteractionState.Failed;
             return;
         }
 
-        if (drainWithCapsule(commandBuffer, context, itemInHand, fluxHandler, action)) {
+        if (drainWithCapsule(commandBuffer, context, itemInHand, handler, action)) {
             return;
         }
 
@@ -58,13 +57,13 @@ public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
 
     }
 
-    private boolean drainWithCapsule(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux, LiquidStack> container, IFluxHandler.FluxAction action) {
+    private boolean drainWithCapsule(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux> handler, IFluxHandler.FluxAction action) {
         LiquidCapsuleType capsuleType = LiquidCapsuleType.getLiquidCapsuleType(itemInHand);
         if (capsuleType == null || !capsuleType.isEmptyCapsule(itemInHand)) {
             return false;
         }
 
-        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, container, action);
+        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, handler, action);
         if (resultItem != null) {
             if (action.execute()) {
                 InteractionUtil.exchangeHeldItem(commandBuffer, context, 1, resultItem);

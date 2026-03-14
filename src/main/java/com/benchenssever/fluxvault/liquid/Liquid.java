@@ -17,7 +17,7 @@ public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetM
 
     public static final String EMPTY_ID = "Empty";
     public static final AssetBuilderCodec<String, Liquid> CODEC = AssetBuilderCodec.builder(Liquid.class, Liquid::new, Codec.STRING,
-                    Liquid::setId, Liquid::getId, Liquid::setAssetData, Liquid::getAssetData)
+                    (o, v) -> o.liquidID = v, Liquid::getId, (o, v) -> o.assetData = v, Liquid::getAssetData)
             .append(new KeyedCodec<>("Hazards", Codec.STRING_ARRAY), Liquid::setTraitsByArrays, Liquid::getHazardsToArrays).add()
             .build();
     public static final Liquid EMPTY = new Liquid();
@@ -45,10 +45,6 @@ public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetM
         return liquidID;
     }
 
-    private void setId(String liquidID) {
-        this.liquidID = liquidID;
-    }
-
     public String[] getHazardsToArrays() {
         return hazards.toArray(String[]::new);
     }
@@ -67,9 +63,5 @@ public class Liquid implements JsonAssetWithMap<String, IndexedLookupTableAssetM
 
     public AssetExtraInfo.Data getAssetData() {
         return assetData;
-    }
-
-    private void setAssetData(AssetExtraInfo.Data assetData) {
-        this.assetData = assetData;
     }
 }

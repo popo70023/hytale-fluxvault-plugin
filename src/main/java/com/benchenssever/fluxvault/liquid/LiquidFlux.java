@@ -6,7 +6,7 @@ import com.benchenssever.fluxvault.api.FluxType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
+public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
     public LiquidFlux(LiquidStack... stacks) {
         super(stacks);
@@ -16,25 +16,29 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
         super(stacks);
     }
 
-    @Override
-    public FluxType<LiquidFlux, LiquidStack> getFluxType() {
+    public static FluxType<LiquidFlux, LiquidStack> getFluxType() {
         return FluxType.LIQUID;
     }
 
     @Override
-    public void addStack(LiquidStack stack) {
-        int index = this.getIndexOf(stack);
-        if (index == -1) {
-            stacks.add(stack);
-        } else {
-            stacks.get(index).addQuantity(stack.getQuantity());
+    public LiquidFlux addStack(LiquidStack... stacks) {
+        if (stacks == null) return this;
+
+        for (LiquidStack stack : stacks) {
+            int index = this.findIndexOfTarget(stack);
+            if (index == -1) {
+                this.stacks.add(stack);
+            } else {
+                this.stacks.get(index).addQuantity(stack.getQuantity());
+            }
         }
+        return this;
     }
 
     @Override
     public long getAllQuantity() {
         long allQuantity = 0;
-        for (LiquidStack s : this.stacks) {
+        for (LiquidStack s : stacks) {
             if (s != null && !s.isEmpty()) {
                 allQuantity += s.getQuantity();
             }
@@ -55,8 +59,13 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidFlux, LiquidStack> {
     }
 
     @Override
-    public boolean matchesStack(LiquidStack stack, LiquidStack reference) {
-        return stack.isLiquidEqual(reference.getLiquid());
+    public boolean isIndexEmpty(int index) {
+        return getStack(index) == null || getStack(index).getQuantity() <= 0;
+    }
+
+    @Override
+    public boolean matchesWithIndex(int index, LiquidStack reference) {
+        return getStack(index).isEquivalentType(reference);
     }
 
     @Override

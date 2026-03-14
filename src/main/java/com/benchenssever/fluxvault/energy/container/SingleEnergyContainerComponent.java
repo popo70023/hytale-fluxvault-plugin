@@ -65,7 +65,7 @@ public class SingleEnergyContainerComponent implements Component<ChunkStore>, IF
 
     @NullableDecl
     @Override
-    public <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(FluxType<T, D> type) {
+    public <T extends IFlux<D>, D> IFluxHandler<T> getFluxHandler(FluxType<T, D> type) {
         if (type == FluxType.FLUX_ENERGY) {
             return type.castHandler(this.container);
         }

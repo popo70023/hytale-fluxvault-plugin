@@ -98,25 +98,26 @@ public class LiquidCapsuleType {
     }
 
     @Nullable
-    public static ItemStack interactWithContainer(ItemStack capsule, IFluxHandler<LiquidFlux, LiquidStack> container, IFluxHandler.FluxAction action) {
+    public static ItemStack interactWithContainer(ItemStack capsule, IFluxHandler<LiquidFlux> handler, IFluxHandler.FluxAction action) {
         LiquidCapsuleType capsuleType = getLiquidCapsuleType(capsule);
         if (capsuleType == null) return null;
         boolean isEmptyCapsule = capsuleType.isEmptyCapsule(capsule);
 
-        LiquidFlux contentFlux = new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule);
-        LiquidFlux interactedFlux = isEmptyCapsule ? container.drain(contentFlux, IFluxHandler.FluxAction.SIMULATE) : container.fill(contentFlux, IFluxHandler.FluxAction.SIMULATE);
+        LiquidFlux contentFlux = (LiquidFlux) new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule);
+        LiquidFlux interactedFlux = isEmptyCapsule ? handler.drain(contentFlux, IFluxHandler.FluxAction.SIMULATE) : handler.fill(contentFlux, IFluxHandler.FluxAction.SIMULATE);
 
-        FluxVaultPlugin.getPluginLogger().atInfo().log("interactedFlux is :" + interactedFlux);
-        if (!isEmptyCapsule && interactedFlux.isEmpty()) {
-            if (action.execute()) {
-                container.fill(contentFlux, IFluxHandler.FluxAction.EXECUTE);
+        if (!interactedFlux.isEmpty() && interactedFlux.getAllQuantity() == capsuleType.getCapacity()) {
+            if (isEmptyCapsule) {
+                if (action.execute()) {
+                    handler.drain(contentFlux, IFluxHandler.FluxAction.EXECUTE);
+                }
+                return capsuleType.getCapsuleWithLiquid(interactedFlux.getStack(0).getLiquid());
+            } else {
+                if (action.execute()) {
+                    handler.fill(contentFlux, IFluxHandler.FluxAction.EXECUTE);
+                }
+                return capsuleType.getEmptyCapsule();
             }
-            return capsuleType.getEmptyCapsule();
-        } else if (isEmptyCapsule && !interactedFlux.isEmpty() && interactedFlux.getStack(0).getQuantity() == capsuleType.getCapacity()) {
-            if (action.execute()) {
-                container.drain(contentFlux, IFluxHandler.FluxAction.EXECUTE);
-            }
-            return capsuleType.getCapsuleWithLiquid(interactedFlux.getStack(0).getLiquid());
         }
 
         return null;

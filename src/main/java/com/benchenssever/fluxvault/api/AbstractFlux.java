@@ -14,13 +14,22 @@ import java.util.function.Predicate;
  * Concrete implementations (e.g., LiquidFlux) only need to define resource-specific logic.
  * </p>
  *
- * @param <T> The concrete implementation type.
  * @param <D> The data type.
  */
-public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T, D> {
+public abstract class AbstractFlux<D> implements IFlux<D> {
     @Nonnull
     protected Predicate<D> validator = _ -> true;
     private long transferLimit = Long.MAX_VALUE;
+
+    @Override
+    public int findIndexOfFirstMatchesStack(Predicate<D> validator) {
+        for (int i = 0; i < getStackSize(); i++) {
+            if (!isIndexEmpty(i) && validator.test(getStack(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     @Override
     public long getTransferLimit() {
@@ -32,10 +41,9 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         this.transferLimit = Math.max(0, limit);
     }
 
-    @SuppressWarnings("unchecked")
-    public T limit(long limit) {
+    public AbstractFlux<D> withLimit(long limit) {
         setTransferLimit(limit);
-        return (T) this;
+        return this;
     }
 
     @Override
@@ -45,17 +53,25 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public T withValidator(Predicate<D> validator) {
+    public void setValidator(Predicate<D> validator) {
         this.validator = (validator != null) ? validator : _ -> true;
-        return (T) this;
+    }
+
+    public AbstractFlux<D> withValidator(Predicate<D> validator) {
+        setValidator(validator);
+        return this;
+    }
+
+    @Override
+    public Iterator<D> iterator() {
+        return getStacks().iterator();
     }
 
     // =================================================================================
     // Strategy: Bundle (List-backed)
     // =================================================================================
 
-    public abstract static class Bundle<T extends IFlux<T, D>, D> extends AbstractFlux<T, D> {
+    public abstract static class Bundle<D> extends AbstractFlux<D> {
 
         /**
          * Backing storage for data stacks.
@@ -96,12 +112,11 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         }
 
         @Override
-        public int getIndexOf(D stack) {
-            if (stack == null) return -1;
+        public int findIndexOfTarget(D target) {
+            if (target == null) return -1;
 
             for (int i = 0; i < stacks.size(); i++) {
-                D current = stacks.get(i);
-                if (matchesStack(current, stack)) {
+                if (matchesWithIndex(i, target)) {
                     return i;
                 }
             }
@@ -109,15 +124,16 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
         }
 
         @Override
-        public void setStack(int index, D stack) {
+        public D setStack(int index, D stack) {
             if (index >= 0 && index < stacks.size()) {
                 stacks.set(index, stack);
             }
+            return stack;
         }
 
         @Override
-        public Iterator<D> iterator() {
-            return stacks.iterator();
+        public D removeStack(int index) {
+            return stacks.remove(index);
         }
     }
 
@@ -125,7 +141,7 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
     // Strategy: Packet (Single-Value optimized)
     // =================================================================================
 
-    public abstract static class Packet<T extends IFlux<T, D>, D> extends AbstractFlux<T, D> {
+    public abstract static class Packet<D> extends AbstractFlux<D> {
 
         /**
          * Direct storage for the single data stack.
@@ -154,27 +170,47 @@ public abstract class AbstractFlux<T extends IFlux<T, D>, D> implements IFlux<T,
             return content == null ? Collections.emptyList() : Collections.singletonList(content);
         }
 
+        public D getStack() {
+            return getStack(0);
+        }
+
         @Override
         public D getStack(int index) {
             return index == 0 ? content : null;
         }
 
         @Override
-        public int getIndexOf(D stack) {
-            if (stack == null) return -1;
-            return matchesStack(content, stack) ? 0 : -1;
+        public int findIndexOfTarget(D target) {
+            if (target == null) return -1;
+            return matchesWithIndex(0, target) ? 0 : -1;
+        }
+
+        public void setContent(D content) {
+            setStack(0, content);
         }
 
         @Override
-        public void setStack(int index, D stack) {
+        public D setStack(int index, D stack) {
             if (index == 0) {
                 this.content = stack;
+            } else {
+                throw new IndexOutOfBoundsException("Packet only supports index 0!");
             }
+            return stack;
+        }
+
+        public D removeStack() {
+            return removeStack(0);
         }
 
         @Override
-        public Iterator<D> iterator() {
-            return getStacks().iterator();
+        public D removeStack(int index) {
+            if (index == 0) {
+                D old = content;
+                this.content = null;
+                return old;
+            }
+            return null;
         }
     }
 }

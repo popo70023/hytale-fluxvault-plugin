@@ -3,26 +3,32 @@ package com.benchenssever.fluxvault.energy;
 import com.benchenssever.fluxvault.api.AbstractFlux;
 import com.benchenssever.fluxvault.api.FluxType;
 
-public class EnergyFlux extends AbstractFlux.Packet<EnergyFlux, FluxEnergy> {
+public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
+
+    public EnergyFlux() {
+        super(null);
+    }
 
     public EnergyFlux(FluxEnergy content) {
         super(content);
     }
 
-    @Override
-    public FluxType<EnergyFlux, FluxEnergy> getFluxType() {
+    public static FluxType<EnergyFlux, FluxEnergy> getFluxType() {
         return FluxType.FLUX_ENERGY;
     }
 
     @Override
-    public void addStack(FluxEnergy stack) {
-        if (stack == null || stack.isEmpty()) return;
+    public EnergyFlux addStack(FluxEnergy... stacks) {
+        if (stacks == null) return this;
 
-        if (this.content == null || this.content.isEmpty()) {
-            this.content = stack.copy();
-        } else {
-            this.content.addQuantity(stack.getQuantity());
+        for (FluxEnergy stack : stacks) {
+            if (this.content == null || this.content.isEmpty()) {
+                this.content = stack.copy();
+            } else {
+                this.content.addQuantity(stack.getQuantity());
+            }
         }
+        return this;
     }
 
     @Override
@@ -37,7 +43,12 @@ public class EnergyFlux extends AbstractFlux.Packet<EnergyFlux, FluxEnergy> {
     }
 
     @Override
-    public boolean matchesStack(FluxEnergy stack, FluxEnergy reference) {
+    public boolean isIndexEmpty(int index) {
+        return getStack(index) == null || getStacks().isEmpty();
+    }
+
+    @Override
+    public boolean matchesWithIndex(int index, FluxEnergy reference) {
         return true;
     }
 

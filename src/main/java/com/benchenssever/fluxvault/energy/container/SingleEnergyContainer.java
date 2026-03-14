@@ -1,17 +1,18 @@
 package com.benchenssever.fluxvault.energy.container;
 
-import com.benchenssever.fluxvault.api.AbstractContainer;
+import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.energy.EnergyFlux;
 import com.benchenssever.fluxvault.energy.FluxEnergy;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
+import java.util.Collections;
 import java.util.List;
 
-public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<EnergyFlux, FluxEnergy> {
+public class SingleEnergyContainer extends EnergyContainer.fixedCapacity implements IFluxHandler<EnergyFlux> {
     protected FluxEnergy content;
 
     protected SingleEnergyContainer(FluxEnergy content, long capacity, String capacityTypeStr) {
-        super(capacity, capacityTypeStr);
+        super(capacityTypeStr, capacity);
         this.content = content;
     }
 
@@ -22,7 +23,7 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
 
     @Override
     public List<FluxEnergy> getContents() {
-        return List.of(content);
+        return Collections.singletonList(content);
     }
 
     @Override
@@ -38,81 +39,70 @@ public class SingleEnergyContainer extends AbstractContainer.fixedCapacity<Energ
     }
 
     @Override
-    public FluxEnergy addContent(FluxEnergy content) {
-        return content;
-    }
-
-    @Override
-    public int getFirstContentIndex() {
-        return 0;
-    }
-
-    @Override
-    public int findContentIndex(FluxEnergy content) {
-        return 0;
-    }
-
-    @Override
     public long getAllContentQuantity() {
-        return content.getQuantity();
+        return content == null ? 0 : content.getQuantity();
     }
 
     @NonNullDecl
     @Override
     public EnergyFlux fill(@NonNullDecl EnergyFlux resource, @NonNullDecl FluxAction action) {
-        if (resource.isEmpty()) return resource;
-        if (isInfiniteContent() && !this.content.isEmpty()) return resource;
+        EnergyFlux resultFlux = new EnergyFlux();
+        if (resource.isEmpty()) return resultFlux;
+        if (isInfiniteContent() && !this.content.isEmpty()) return resultFlux;
+
+        FluxEnergy resourceStack = resource.getStack();
+        long resourceQuantity = resourceStack.getQuantity();
 
         if (isInfiniteContent() && this.content.isEmpty()) {
-            if (action.simulate()) resource = resource.copy();
-            FluxEnergy resourceStack = resource.getStack(0);
-            resourceStack.addQuantity(-Math.min(getContainerCapacity(), resource.getTransferLimit()));
-            return resource;
+            long canFill = Math.min(Math.min(resourceQuantity, getContainerCapacity()), resource.getTransferLimit());
+            if (action.execute()) {
+                if (resourceStack.addQuantity(-canFill) == 0) {
+                    resource.removeStack();
+                }
+            }
+
+            return resultFlux.addStack(FluxEnergy.of(canFill));
         }
 
         long spaceAvailable = capacity - content.getQuantity();
-        if (spaceAvailable <= 0) return resource;
+        if (spaceAvailable <= 0) return resultFlux;
 
-        long canFill = Math.min(Math.min(spaceAvailable, resource.getStack(0).getQuantity()), resource.getTransferLimit());
-
+        long canFill = Math.min(Math.min(spaceAvailable, resourceQuantity), resource.getTransferLimit());
         if (action.execute()) {
             content.addQuantity(canFill);
             onContentsChanged();
-        }
-        if (action.simulate()) {
-            resource = resource.copy();
-        }
-        resource.getStack(0).addQuantity(-canFill);
 
-        return resource;
+            if (resourceStack.addQuantity(-canFill) == 0) {
+                resource.removeStack();
+            }
+        }
+
+        return resultFlux.addStack(FluxEnergy.of(canFill));
     }
 
     @NonNullDecl
     @Override
     public EnergyFlux drain(@NonNullDecl EnergyFlux requestResources, @NonNullDecl FluxAction action) {
-        if (this.content.isEmpty() || requestResources.isEmpty()) return new EnergyFlux(null);
+        EnergyFlux resultFlux = new EnergyFlux();
+        if (this.content.isEmpty() || requestResources.isEmpty()) return resultFlux;
 
-        FluxEnergy requestStack = requestResources.getStack(0);
-        long requestQuantity = requestResources.getStack(0).getQuantity();
+        FluxEnergy requestStack = requestResources.getStack();
+        long requestQuantity = requestStack.getQuantity();
         long limit = requestResources.getTransferLimit();
-
-        if (isInfiniteContent()) {
-            long toDrain = Math.min(Math.min(requestQuantity, getContainerCapacity()), requestResources.getTransferLimit());
-            if (action.execute()) {
-                requestStack.addQuantity(-toDrain);
-            }
-            return new EnergyFlux(FluxEnergy.of(toDrain));
-        }
-
-        long toDrain = Math.min(Math.min(content.getQuantity(), requestQuantity), limit);
-
-        if (toDrain <= 0) return new EnergyFlux(null);
+        long toDrain = isInfiniteContent() ? Math.min(Math.min(requestQuantity, getContainerCapacity()), limit) : Math.min(Math.min(requestQuantity, content.getQuantity()), limit);
+        if (toDrain <= 0) return resultFlux;
 
         if (action.execute()) {
-            content.addQuantity(-toDrain);
-            onContentsChanged();
+            if (!isInfiniteContent()) {
+                content.addQuantity(-toDrain);
+                onContentsChanged();
+            }
+
+            if (requestStack.addQuantity(-toDrain) == 0) {
+                requestResources.removeStack();
+            }
         }
 
-        return new EnergyFlux(FluxEnergy.of(toDrain));
+        return resultFlux.addStack(FluxEnergy.of(toDrain));
     }
 }

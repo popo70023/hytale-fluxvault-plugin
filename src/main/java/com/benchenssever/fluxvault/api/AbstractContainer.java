@@ -1,6 +1,6 @@
 package com.benchenssever.fluxvault.api;
 
-public abstract class AbstractContainer<T extends IFlux<T, D>, D> implements IFluxContainer<T, D> {
+public abstract class AbstractContainer<D> implements IFluxContainer<D> {
     protected CapacityType capacityType;
 
     protected AbstractContainer(String capacityTypeStr) {
@@ -24,31 +24,13 @@ public abstract class AbstractContainer<T extends IFlux<T, D>, D> implements IFl
     }
 
     public boolean isInfiniteContent() {
-        return this.capacityType == CapacityType.INFINITE_CONTENT;
+        return this.capacityType.infiniteContent();
     }
 
     public boolean isInfiniteCapacity() {
-        return this.capacityType == CapacityType.INFINITE_CAPACITY;
+        return this.capacityType.infiniteCapacity();
     }
 
     public void onContentsChanged() {
-    }
-
-
-    public abstract static class fixedCapacity<T extends IFlux<T, D>, D> extends AbstractContainer<T, D> {
-        protected long capacity;
-
-        public fixedCapacity(long capacity, String capacityTypeStr) {
-            super(capacityTypeStr);
-            this.capacity = capacity;
-        }
-
-        public long getContainerCapacity() {
-            return this.capacityType == CapacityType.INFINITE_CAPACITY ? Long.MAX_VALUE : capacity;
-        }
-
-        public void setContainerCapacity(long capacity) {
-            this.capacity = capacity;
-        }
     }
 }

@@ -4,6 +4,7 @@ import com.benchenssever.fluxvault.liquid.Liquid;
 import com.benchenssever.fluxvault.liquid.interaction.DrainLiquidContainerInteraction;
 import com.benchenssever.fluxvault.liquid.interaction.FillLiquidContainerInteraction;
 import com.benchenssever.fluxvault.liquid.interaction.OpenSingleLiquidContainerInteraction;
+import com.benchenssever.fluxvault.liquid.interaction.SingleLiquidContainerInformationInteraction;
 import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
@@ -34,5 +35,6 @@ public class FluxAssetRegistry {
         codecRegistry.register(FillLiquidContainerInteraction.ID, FillLiquidContainerInteraction.class, FillLiquidContainerInteraction.CODEC);
         codecRegistry.register(DrainLiquidContainerInteraction.ID, DrainLiquidContainerInteraction.class, DrainLiquidContainerInteraction.CODEC);
         codecRegistry.register(OpenSingleLiquidContainerInteraction.ID, OpenSingleLiquidContainerInteraction.class, OpenSingleLiquidContainerInteraction.CODEC);
+        codecRegistry.register(SingleLiquidContainerInformationInteraction.ID, SingleLiquidContainerInformationInteraction.class, SingleLiquidContainerInformationInteraction.CODEC);
     }
 }

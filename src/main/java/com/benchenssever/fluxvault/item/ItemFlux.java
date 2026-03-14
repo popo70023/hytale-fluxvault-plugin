@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: Implement merging and stacking logic in addStack, ensuring that items with the same ID and compatible metadata are combined according to Hytale's mechanics.
-public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
+public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
     public ItemFlux(ItemStack... stacks) {
         super(stacks);
@@ -42,19 +42,23 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
         return newStack;
     }
 
-    @Override
-    public FluxType<ItemFlux, ItemStack> getFluxType() {
+    public static FluxType<ItemFlux, ItemStack> getFluxType() {
         return FluxType.ITEM;
     }
 
     @Override
-    public void addStack(ItemStack stack) {
-        int index = this.getIndexOf(stack);
-        if (index == -1) {
-            stacks.add(stack);
-        } else {
-            stacks.get(index).withQuantity(stacks.get(index).getQuantity() + stack.getQuantity());
+    public ItemFlux addStack(ItemStack... stacks) {
+        if (stacks == null) return this;
+        for (ItemStack stack : stacks) {
+            int index = this.findIndexOfTarget(stack);
+            if (index == -1) {
+                this.stacks.add(stack);
+            } else {
+                ItemStack oldStack = this.stacks.get(index);
+                this.stacks.set(index, new ItemStack(oldStack.getItemId(), oldStack.getQuantity() + stack.getQuantity(), oldStack.getMetadata()));
+            }
         }
+        return this;
     }
 
     @Override
@@ -81,8 +85,13 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemFlux, ItemStack> {
     }
 
     @Override
-    public boolean matchesStack(ItemStack stack, ItemStack reference) {
-        return stack.getItem().equals(reference.getItem());
+    public boolean isIndexEmpty(int index) {
+        return getStack(index) == null || getStacks().isEmpty();
+    }
+
+    @Override
+    public boolean matchesWithIndex(int index, ItemStack reference) {
+        return getStack(index).isEquivalentType(reference);
     }
 
     @Override

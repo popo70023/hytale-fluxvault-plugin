@@ -8,33 +8,25 @@ import com.benchenssever.fluxvault.liquid.LiquidStack;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 /**
- * Identity token binding a Carrier type (T) to its Data type (D).
+ * Identity token binding a Carrier type (F) to its Data type (D).
  * <p>
  * Used for safe runtime casting, type comparison, and retrieving specific handlers.
  * </p>
  *
- * @param <T> The Carrier implementation (e.g., {@code LiquidFlux}).
+ * @param <F> The Carrier implementation (e.g., {@code LiquidFlux}).
  * @param <D> The Data type (e.g., {@code LiquidStack}).
  */
-public final class FluxType<T extends IFlux<T, D>, D> {
+public final class FluxType<F extends IFlux<D>, D> {
 
-    /**
-     * Standard type for Liquid resources.
-     */
-    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("LIQUID", LiquidFlux.class, LiquidStack.class);
-
-    /**
-     * Standard type for Item resources.
-     */
     public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("ITEM", ItemFlux.class, ItemStack.class);
-
+    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("LIQUID", LiquidFlux.class, LiquidStack.class);
     public static final FluxType<EnergyFlux, FluxEnergy> FLUX_ENERGY = new FluxType<>("FLUX_ENERGY", EnergyFlux.class, FluxEnergy.class);
 
     private final String name;
-    private final Class<T> resourceClass;
+    private final Class<F> resourceClass;
     private final Class<D> dataClass;
 
-    private FluxType(String name, Class<T> resourceClass, Class<D> dataClass) {
+    private FluxType(String name, Class<F> resourceClass, Class<D> dataClass) {
         this.name = name;
         this.resourceClass = resourceClass;
         this.dataClass = dataClass;
@@ -48,13 +40,13 @@ public final class FluxType<T extends IFlux<T, D>, D> {
     }
 
     /**
-     * Casts a generic IFlux interface to the concrete carrier type {@code T}.
+     * Casts a generic IFlux interface to the concrete carrier type {@code F}.
      *
      * @param flux The carrier to cast.
      * @return The cast carrier.
-     * @throws ClassCastException if the flux is not an instance of {@code T}.
+     * @throws ClassCastException if the flux is not an instance of {@code F}.
      */
-    public T castResource(IFlux<T, D> flux) {
+    public F castResource(IFlux<D> flux) {
         if (resourceClass.isInstance(flux)) {
             return resourceClass.cast(flux);
         }
@@ -76,21 +68,21 @@ public final class FluxType<T extends IFlux<T, D>, D> {
     }
 
     /**
-     * Unchecked cast of a generic handler to the specific type {@code <T, D>}.
+     * Unchecked cast of a generic handler to the specific type {@code <F, D>}.
      * <p>
      * Used to bridge generic API calls to specific implementations.
      * </p>
      *
      * @param handler The handler to cast.
-     * @return The handler typed to {@code <T, D>}.
+     * @return The handler typed to {@code <F, D>}.
      */
     @SuppressWarnings("unchecked")
-    public IFluxHandler<T, D> castHandler(IFluxHandler<?, ?> handler) {
-        return (IFluxHandler<T, D>) handler;
+    public IFluxHandler<F> castHandler(IFluxHandler<?> handler) {
+        return (IFluxHandler<F>) handler;
     }
 
     @Override
     public String toString() {
-        return "FluxType{" + "name='" + name + '\'' + ", T=" + resourceClass.getSimpleName() + ", D=" + dataClass.getSimpleName() + '}';
+        return "FluxType{" + "name='" + name + '\'' + ", F=" + resourceClass.getSimpleName() + ", D=" + dataClass.getSimpleName() + '}';
     }
 }

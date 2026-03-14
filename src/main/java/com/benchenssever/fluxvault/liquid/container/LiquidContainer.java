@@ -1,7 +1,6 @@
 package com.benchenssever.fluxvault.liquid.container;
 
 import com.benchenssever.fluxvault.api.AbstractContainer;
-import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
 
 import java.util.Arrays;
@@ -10,12 +9,31 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public abstract class LiquidContainer extends AbstractContainer<LiquidFlux, LiquidStack> {
+public abstract class LiquidContainer extends AbstractContainer<LiquidStack> {
     protected Set<String> acceptedHazards = Set.of();
 
     protected LiquidContainer(String capacityTypeStr, String[] acceptedHazards) {
         super(capacityTypeStr);
         this.setAcceptedHazards(acceptedHazards);
+    }
+
+    @Override
+    public int findFirstIndex() {
+        for (int i = 0; i < getContainerMaxSize(); i++) {
+            if (!getContent(i).isEmpty()) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public int findIndexOfTarget(LiquidStack target, boolean ignoreFull) {
+        for (int i = 0; i < getContainerMaxSize(); i++) {
+            LiquidStack theContent = getContent(i);
+            if (theContent.isEquivalentType(target)) {
+                if (!ignoreFull || theContent.getQuantity() != getContainerCapacity()) return i;
+            }
+        }
+        return -1;
     }
 
     public Predicate<LiquidStack> getValidator() {
@@ -52,7 +70,7 @@ public abstract class LiquidContainer extends AbstractContainer<LiquidFlux, Liqu
         }
 
         public long getContainerCapacity() {
-            return this.capacityType == CapacityType.INFINITE_CAPACITY ? Long.MAX_VALUE : capacity;
+            return isInfiniteCapacity() ? Long.MAX_VALUE : capacity;
         }
 
         public void setContainerCapacity(long capacity) {

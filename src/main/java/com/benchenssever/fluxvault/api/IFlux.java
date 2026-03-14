@@ -10,26 +10,14 @@ import java.util.function.Predicate;
  * This interface is mutable to support logistics operations (e.g., checking off items from a request list).
  * </p>
  *
- * @param <T> The carrier type (Self-type).
  * @param <D> The data type (e.g., LiquidStack).
  */
-public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
-
-    /**
-     * @return The identity token for this Flux type.
-     */
-    FluxType<T, D> getFluxType();
+public interface IFlux<D> extends Iterable<D> {
 
     /**
      * @return The number of stacks in this carrier.
      */
     int getStackSize();
-
-    long getTransferLimit();
-
-    void setTransferLimit(long limit);
-
-    T limit(long limit);
 
     /**
      * @return A list view of all stacks.
@@ -43,17 +31,21 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
      */
     D getStack(int index);
 
-    int getIndexOf(D stack);
+    int findIndexOfFirstMatchesStack(Predicate<D> validator);
+
+    int findIndexOfTarget(D target);
 
     /**
      * Replaces the stack at the specified index.
      */
-    void setStack(int index, D stack);
+    D setStack(int index, D stack);
 
     /**
-     * Appends a stack to the end of the payload.
+     * Appends stacks to the end of the payload.
      */
-    void addStack(D stack);
+    IFlux<D> addStack(D... stacks);
+
+    D removeStack(int index);
 
     /**
      * @return The total quantity of all data combined.
@@ -65,6 +57,12 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
      */
     boolean isEmpty();
 
+    boolean isIndexEmpty(int index);
+
+    long getTransferLimit();
+
+    void setTransferLimit(long limit);
+
     /**
      * @return The transient validation predicate. Never null.
      */
@@ -75,23 +73,21 @@ public interface IFlux<T extends IFlux<T, D>, D> extends Iterable<D> {
 
     /**
      * Sets a transient validator for this carrier.
-     *
-     * @return This instance for chaining.
      */
-    T withValidator(Predicate<D> validator);
+    void setValidator(Predicate<D> validator);
 
     /**
-     * Checks if the target data matches this carrier's validator.
+     * Checks if the target data matchesWithFlux this carrier's validator.
      */
-    default boolean matches(D targetData) {
+    default boolean matchesWithFlux(D targetData) {
         if (targetData == null) return false;
         return getValidator().test(targetData);
     }
 
-    boolean matchesStack(D stack, D reference);
+    boolean matchesWithIndex(int index, D reference);
 
     /**
      * @return A deep copy of this carrier.
      */
-    T copy();
+    IFlux<D> copy();
 }

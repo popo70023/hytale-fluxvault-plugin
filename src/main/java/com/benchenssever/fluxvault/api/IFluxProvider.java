@@ -15,10 +15,10 @@ public interface IFluxProvider {
      * Retrieves the handler for a specific Flux resource type.
      *
      * @param type The type of resource requested (e.g., {@link FluxType#LIQUID}).
-     * @param <T>  The carrier type.
+     * @param <F>  The carrier type.
      * @param <D>  The data type.
      * @return The handler instance, or {@code null} if the type is not supported.
      */
     @Nullable
-    <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(FluxType<T, D> type);
+    <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(FluxType<F, D> type);
 }

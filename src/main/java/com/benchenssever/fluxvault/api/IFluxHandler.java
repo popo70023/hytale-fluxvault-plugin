@@ -9,20 +9,19 @@ import javax.annotation.Nonnull;
  * pipes, or storage containers.
  * </p>
  *
- * @param <T> The carrier type (e.g., LiquidFlux).
- * @param <D> The data type (e.g., LiquidStack).
+ * @param <F> The carrier type (e.g., LiquidFlux).
  */
-public interface IFluxHandler<T extends IFlux<T, D>, D> {
+public interface IFluxHandler<F extends IFlux<?>> {
 
     /**
      * Inserts resources into this handler.
      *
      * @param resource The resources to insert.
      * @param action   The operation mode (SIMULATE or EXECUTE).
-     * @return The <b>remainder</b> that could not be accepted. Returns empty if fully accepted.
+     * @return The resources <b>actually inserted</b>. Returns empty if nothing was filled.
      */
     @Nonnull
-    T fill(@Nonnull T resource, @Nonnull FluxAction action);
+    F fill(@Nonnull F resource, @Nonnull FluxAction action);
 
     /**
      * Extracts resources from this handler based on a request.
@@ -32,7 +31,7 @@ public interface IFluxHandler<T extends IFlux<T, D>, D> {
      * @return The resources <b>actually extracted</b>. Returns empty if nothing was drained.
      */
     @Nonnull
-    T drain(@Nonnull T requestResources, @Nonnull FluxAction action);
+    F drain(@Nonnull F requestResources, @Nonnull FluxAction action);
 
     /**
      * Operation mode for Flux interactions.

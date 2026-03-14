@@ -1,2 +1,5 @@
+customUI.singleLiquidContainer.title = Single Liquid Container
+items.Fluid_Milk.name = Milk
+items.Fluid_Mosshorn_Milk.name = Mosshorn Milk
 items.Barrel_Liquid.name = Liquid Barrel
-items.Barrel_Liquid.description = A barrel can be used to store and transport liquids.
+items.Barrel_Liquid.description = A barrel can be used to store liquids.

@@ -50,7 +50,7 @@ public class InteractionUtil {
     }
 
     @Nullable
-    public static <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(World world, Vector3i targetBlock, FluxType<T, D> fluxType) {
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType) {
         ChunkStore chunkStore = world.getChunkStore();
         long chunkIndex = ChunkUtil.indexChunkFromBlock(targetBlock.x, targetBlock.z);
         BlockComponentChunk blockComponentChunk = chunkStore.getChunkComponent(chunkIndex, BlockComponentChunk.getComponentType());
@@ -69,7 +69,7 @@ public class InteractionUtil {
                         Component<ChunkStore> component = store.getComponent(blockRef, compType);
 
                         if (component instanceof IFluxProvider provider) {
-                            IFluxHandler<T, D> handler = provider.getFluxHandler(fluxType);
+                            IFluxHandler<F> handler = provider.getFluxHandler(fluxType);
                             if (handler != null) {
                                 return handler;
                             }

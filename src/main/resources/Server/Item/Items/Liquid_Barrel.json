@@ -70,11 +70,11 @@
                   "ClearSoundEventOnFinish": true,
                   "LocalSoundEventId": "SFX_Water_MoveIn"
                 }
-              },
-              "Failed": {
-                "Type": "OpenSingleLiquidContainer"
               }
             }
+          },
+          {
+            "Type": "SingleLiquidContainerInformation"
           }
         ]
       }

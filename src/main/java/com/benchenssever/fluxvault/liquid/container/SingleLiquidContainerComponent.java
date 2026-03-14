@@ -5,6 +5,7 @@ import com.benchenssever.fluxvault.api.IFlux;
 import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.api.IFluxProvider;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
+import com.benchenssever.fluxvault.liquid.interaction.LiquidContainerWindow;
 import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -13,6 +14,10 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SingleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
     public static final String ID = "SingleLiquidContainerComponent";
@@ -23,6 +28,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
             .append(new KeyedCodec<>("AcceptedHazards", Codec.STRING_ARRAY), SingleLiquidContainerComponent::setAcceptedHazards, SingleLiquidContainerComponent::getAcceptedHazards).add()
             .build();
     private final SingleLiquidContainer container;
+    private final Map<UUID, LiquidContainerWindow> windows = new ConcurrentHashMap<>();
 
     public SingleLiquidContainerComponent() {
         this.container = new SingleLiquidContainer(LiquidStack.EMPTY, 10000, "FINITE", new String[0]);
@@ -38,6 +44,10 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
 
     public static ComponentType<ChunkStore, SingleLiquidContainerComponent> getComponentType() {
         return ComponentTypes.SINGLE_LIQUID_CONTAINER;
+    }
+
+    public SingleLiquidContainer getContainer() {
+        return this.container;
     }
 
     public LiquidStack getContent() {
@@ -74,7 +84,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
 
     @NullableDecl
     @Override
-    public <T extends IFlux<T, D>, D> IFluxHandler<T, D> getFluxHandler(FluxType<T, D> type) {
+    public <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(FluxType<F, D> type) {
         if (type == FluxType.LIQUID) {
             return type.castHandler(this.container);
         }
@@ -90,5 +100,9 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
                 this.getCapacityType(),
                 this.getAcceptedHazards()
         );
+    }
+
+    public Map<UUID, LiquidContainerWindow> getActiveWindows() {
+        return this.windows;
     }
 }

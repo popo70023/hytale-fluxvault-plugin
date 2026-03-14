@@ -7,7 +7,18 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import java.util.Objects;
 
 public class LiquidStack {
-    public final static LiquidStack EMPTY = new LiquidStack();
+    public final static LiquidStack EMPTY = new LiquidStack() {
+        @Override
+        public void setQuantity(long setQuantity) {
+            throw new UnsupportedOperationException("Immutable Empty Stack");
+        }
+
+        @Override
+        public long addQuantity(long addQuantity) {
+            throw new UnsupportedOperationException("Immutable Empty Stack");
+        }
+    };
+
     public static final BuilderCodec<LiquidStack> CODEC = BuilderCodec.builder(LiquidStack.class, LiquidStack::new)
             .append(new KeyedCodec<>("LiquidId", Codec.STRING), LiquidStack::setLiquidId, LiquidStack::getLiquidId).add()
             .append(new KeyedCodec<>("Quantity", Codec.LONG), LiquidStack::setQuantity, LiquidStack::getQuantity).add()
@@ -35,14 +46,14 @@ public class LiquidStack {
     }
 
     public static LiquidStack of(String liquidId, long quantity) {
-        if (liquidId == null || (Liquid.EMPTY_ID.equals(liquidId) && quantity <= 0)) {
+        if (liquidId == null || quantity <= 0) {
             return EMPTY;
         }
         return new LiquidStack(liquidId, quantity);
     }
 
     public static LiquidStack of(Liquid liquid, long quantity) {
-        if (liquid == null || (liquid.equals(Liquid.EMPTY) && quantity <= 0)) {
+        if (liquid == null || quantity <= 0) {
             return EMPTY;
         }
         return of(liquid.getId(), quantity);
@@ -62,16 +73,10 @@ public class LiquidStack {
     }
 
     public void setQuantity(long setQuantity) {
-        if (this == EMPTY) {
-            throw new UnsupportedOperationException("Immutable Empty Stack");
-        }
         this.quantity = Math.max(0, setQuantity);
     }
 
     public long addQuantity(long addQuantity) {
-        if (this == EMPTY) {
-            throw new UnsupportedOperationException("Immutable Empty Stack");
-        }
         this.quantity += addQuantity;
         if (this.quantity < 0) this.quantity = 0;
         return this.quantity;
@@ -102,9 +107,10 @@ public class LiquidStack {
         return Objects.equals(getLiquidId(), resource.getLiquidId()) && getQuantity() == resource.getQuantity();
     }
 
-    public boolean isLiquidEqual(Liquid resource) {
-        if (resource == null) return false;
-        return getLiquid().equals(resource);
+    public boolean isEquivalentType(LiquidStack liquidStack) {
+        if (liquidStack == null) {
+            return false;
+        } else return this.liquidId.equals(liquidStack.liquidId);
     }
 
     @Override

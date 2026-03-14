@@ -7,13 +7,12 @@ import java.util.function.Predicate;
  * A handler that exposes internal storage state for inspection and direct manipulation.
  * Used for GUIs, rendering, debugging, or complex automation logic.
  *
- * @param <T> The carrier type.
  * @param <D> The data type.
  */
-public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T, D> {
+public interface IFluxContainer<D> {
 
     /**
-     * @return The maximum number of distinct stacks (slots) this container can hold.
+     * @return The maximum number of distinct stacks (slots) this getContainer can hold.
      */
     int getContainerMaxSize();
 
@@ -35,23 +34,16 @@ public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T
     void setContent(int index, D content);
 
     /**
-     * Attempts to add content, merging if possible.
-     *
-     * @return The remainder that couldn't fit.
+     * @return Finds the index of the first non-empty stack, or -1.
      */
-    D addContent(D content);
+    int findFirstIndex();
 
     /**
-     * @return The index of the first non-empty stack, or -1.
-     */
-    int getFirstContentIndex();
-
-    /**
-     * Finds the index of a specific resource (ignoring quantity).
+     * Finds the index of a specific resource.
      *
      * @return The index, or -1 if not found.
      */
-    int findContentIndex(D content);
+    int findIndexOfTarget(D target, boolean ignoreFull);
 
     /**
      * Callback triggered when contents change.
@@ -59,7 +51,7 @@ public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T
     void onContentsChanged();
 
     /**
-     * @return The max capacity of this container.
+     * @return The max capacity of this getContainer.
      */
     long getContainerCapacity();
 
@@ -78,6 +70,18 @@ public interface IFluxContainer<T extends IFlux<T, D>, D> extends IFluxHandler<T
     enum CapacityType {
         FINITE,
         INFINITE_CAPACITY,
-        INFINITE_CONTENT
+        INFINITE_CONTENT;
+
+        public boolean finite() {
+            return this == FINITE;
+        }
+
+        public boolean infiniteCapacity() {
+            return this == INFINITE_CAPACITY;
+        }
+
+        public boolean infiniteContent() {
+            return this == INFINITE_CONTENT;
+        }
     }
 }
