@@ -5,41 +5,54 @@ import com.benchenssever.fluxvault.energy.FluxEnergy;
 
 public abstract class EnergyContainer extends AbstractContainer<FluxEnergy> {
 
-    protected EnergyContainer(String capacityTypeStr) {
-        super(capacityTypeStr);
-    }
+    public static final String CONTENT_DOCUMENTATION = "The initial Flux Energy stored within the container upon creation.";
 
     @Override
     public int findFirstIndex() {
-        for (int i = 0; i < getContainerMaxSize(); i++) {
-            if (!getContent(i).isEmpty()) return i;
+        lock.readLock().lock();
+        try {
+            for (int i = 0; i < getContainerMaxSize(); i++) {
+                if (!getContent(i).isEmpty()) return i;
+            }
+            return -1;
+        } finally {
+            lock.readLock().unlock();
         }
-        return -1;
     }
 
     @Override
     public int findIndexOfTarget(FluxEnergy target, boolean ignoreFull) {
-        for (int i = 0; i < getContainerMaxSize(); i++) {
-            FluxEnergy theContent = getContent(i);
-            if (!ignoreFull || theContent.getQuantity() != getContainerCapacity()) return i;
+        lock.readLock().lock();
+        try {
+            for (int i = 0; i < getContainerMaxSize(); i++) {
+                FluxEnergy theContent = getContent(i);
+                if (!ignoreFull || theContent.getQuantity() != getCapacity()) return i;
+            }
+            return -1;
+        } finally {
+            lock.readLock().unlock();
         }
-        return -1;
     }
 
-    public abstract static class fixedCapacity extends EnergyContainer {
-        protected long capacity;
+    public abstract static class FixedCapacity extends EnergyContainer {
+        protected volatile long capacity;
 
-        public fixedCapacity(String capacityTypeStr, long capacity) {
-            super(capacityTypeStr);
+        public FixedCapacity(long capacity) {
+            super();
             this.capacity = capacity;
         }
 
-        public long getContainerCapacity() {
-            return isInfiniteCapacity() ? Long.MAX_VALUE : capacity;
+        public long getCapacity() {
+            return capacity;
         }
 
-        public void setContainerCapacity(long capacity) {
-            this.capacity = capacity;
+        public void setCapacity(long capacity) {
+            lock.writeLock().lock();
+            try {
+                this.capacity = capacity;
+            } finally {
+                lock.writeLock().unlock();
+            }
         }
     }
 }

@@ -6,17 +6,17 @@ import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LiquidCapsuleType {
-    public static final Map<String, LiquidCapsuleType> capsuleIdToCapsuleTypes = new HashMap<>();
-    private static final Map<String, LiquidCapsuleType> capsuleToCapsuleType = new HashMap<>();
+    public static final Map<String, LiquidCapsuleType> capsuleIdToCapsuleTypes = new ConcurrentHashMap<>();
+    private static final Map<String, LiquidCapsuleType> itemToCapsuleType = new ConcurrentHashMap<>();
+
     private final String capsuleId;
     private final int capacity;
-    private final Map<Liquid, String> liquidToCapsule = new HashMap<>();
-    private final Map<String, Liquid> capsuleToLiquid = new HashMap<>();
+    private final Map<String, String> liquidToCapsule = new ConcurrentHashMap<>();
+    private final Map<String, String> capsuleToLiquid = new ConcurrentHashMap<>();
 
     private LiquidCapsuleType(String capsuleId, int capacity) {
         this.capsuleId = capsuleId;
@@ -31,10 +31,7 @@ public class LiquidCapsuleType {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be greater than zero.");
         }
-        if (capsuleIdToCapsuleTypes.containsKey(capsuleId)) {
-            throw new IllegalArgumentException("A capsule type with the ID '" + capsuleId + "' is already registered.");
-        }
-        return new LiquidCapsuleType(capsuleId, capacity);
+        return capsuleIdToCapsuleTypes.computeIfAbsent(capsuleId, id -> new LiquidCapsuleType(id, capacity));
     }
 
     public static void registerItemToCapsule(String capsuleId, int capacity, String itemId, String liquidId) {
@@ -42,22 +39,12 @@ public class LiquidCapsuleType {
             FluxVaultPlugin.getPluginLogger().atWarning().log("Item ID cannot be null or empty.");
             return;
         }
+
         if (Item.getAssetMap().getAsset(itemId) == Item.UNKNOWN) {
-            FluxVaultPlugin.getPluginLogger().atWarning().log("Item is UNKNOWN.");
-            return;
+            FluxVaultPlugin.getPluginLogger().atWarning().log("ItemId " + itemId + " is UNKNOWN.");
         }
-        if (capsuleToCapsuleType.containsKey(itemId)) {
-            FluxVaultPlugin.getPluginLogger().atWarning().log("Item '" + itemId + "' is already registered to a capsule.");
-            return;
-        }
-        Liquid liquid;
-        if (Objects.equals(liquidId, Liquid.EMPTY_ID)) liquid = Liquid.EMPTY;
-        else {
-            liquid = Liquid.getLiquidById(liquidId);
-            if (liquid == Liquid.EMPTY) {
-                FluxVaultPlugin.getPluginLogger().atWarning().log("Liquid with ID '" + liquidId + "' does not exist.");
-                return;
-            }
+        if (Liquid.getLiquidById(liquidId) == Liquid.UNKNOWN) {
+            FluxVaultPlugin.getPluginLogger().atWarning().log("liquidId " + liquidId + " is UNKNOWN.");
         }
 
         String currentId = capsuleId;
@@ -86,7 +73,12 @@ public class LiquidCapsuleType {
             }
         }
 
-        targetType.putMapping(liquid, itemId);
+        if (itemToCapsuleType.putIfAbsent(itemId, targetType) != null) {
+            FluxVaultPlugin.getPluginLogger().atWarning().log("Item '" + itemId + "' is already registered to a capsule.");
+            return;
+        }
+
+        targetType.putMapping(liquidId, itemId);
     }
 
     public static boolean isLiquidCapsule(ItemStack itemStack) {
@@ -94,7 +86,7 @@ public class LiquidCapsuleType {
     }
 
     public static LiquidCapsuleType getLiquidCapsuleType(ItemStack itemStack) {
-        return capsuleToCapsuleType.get(itemStack.getItemId());
+        return itemToCapsuleType.get(itemStack.getItemId());
     }
 
     @Nullable
@@ -103,19 +95,13 @@ public class LiquidCapsuleType {
         if (capsuleType == null) return null;
         boolean isEmptyCapsule = capsuleType.isEmptyCapsule(capsule);
 
-        LiquidFlux contentFlux = (LiquidFlux) new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule);
-        LiquidFlux interactedFlux = isEmptyCapsule ? handler.drain(contentFlux, IFluxHandler.FluxAction.SIMULATE) : handler.fill(contentFlux, IFluxHandler.FluxAction.SIMULATE);
+        LiquidFlux contentFlux = new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule);
+        LiquidFlux interactedFlux = isEmptyCapsule ? handler.drain(contentFlux, action.asExact()) : handler.fill(contentFlux, action.asExact());
 
-        if (!interactedFlux.isEmpty() && interactedFlux.getAllQuantity() == capsuleType.getCapacity()) {
+        if (!interactedFlux.isEmpty()) {
             if (isEmptyCapsule) {
-                if (action.execute()) {
-                    handler.drain(contentFlux, IFluxHandler.FluxAction.EXECUTE);
-                }
-                return capsuleType.getCapsuleWithLiquid(interactedFlux.getStack(0).getLiquid());
+                return capsuleType.getCapsuleWithLiquid(interactedFlux.getStack(0).getLiquidId());
             } else {
-                if (action.execute()) {
-                    handler.fill(contentFlux, IFluxHandler.FluxAction.EXECUTE);
-                }
                 return capsuleType.getEmptyCapsule();
             }
         }
@@ -123,14 +109,12 @@ public class LiquidCapsuleType {
         return null;
     }
 
-    private void putMapping(Liquid liquid, String itemId) {
-        if (this.liquidToCapsule.containsKey(liquid)) {
-            FluxVaultPlugin.getPluginLogger().atWarning().log("Liquid '" + liquid.getId() + "' is already registered to this capsule.");
+    private void putMapping(String liquidId, String itemId) {
+        if (this.liquidToCapsule.putIfAbsent(liquidId, itemId) != null) {
+            FluxVaultPlugin.getPluginLogger().atWarning().log("Liquid '" + liquidId + "' is already registered to this capsule.");
             return;
         }
-        this.liquidToCapsule.put(liquid, itemId);
-        this.capsuleToLiquid.put(itemId, liquid);
-        capsuleToCapsuleType.put(itemId, this);
+        this.capsuleToLiquid.put(itemId, liquidId);
     }
 
     public int getCapacity() {
@@ -138,26 +122,24 @@ public class LiquidCapsuleType {
     }
 
     public boolean isEmptyCapsule(ItemStack itemStack) {
-        return itemStack.getItemId().equals(liquidToCapsule.get(Liquid.EMPTY));
+        return itemStack.getItemId().equals(liquidToCapsule.get(Liquid.EMPTY_ID));
     }
 
     public boolean isLiquidHasCapsule(LiquidStack liquidStack) {
-        return liquidToCapsule.containsKey(liquidStack.getLiquid());
+        return liquidToCapsule.containsKey(liquidStack.getLiquidId());
     }
 
     public LiquidStack getLiquidStackInCapsule(ItemStack itemStack) {
-        Liquid liquid = capsuleToLiquid.get(itemStack.getItemId());
-        return liquid == null ? LiquidStack.EMPTY : LiquidStack.of(liquid, capacity);
+        String liquidId = capsuleToLiquid.get(itemStack.getItemId());
+        return LiquidStack.of(liquidId, capacity);
     }
 
     public ItemStack getEmptyCapsule() {
-        String emptyCapsuleID = liquidToCapsule.get(Liquid.EMPTY);
-        if (emptyCapsuleID == null) return ItemStack.EMPTY;
-        return new ItemStack(emptyCapsuleID);
+        return getCapsuleWithLiquid(Liquid.EMPTY_ID);
     }
 
-    public ItemStack getCapsuleWithLiquid(Liquid liquid) {
-        String filledCapsuleID = liquidToCapsule.get(liquid);
+    public ItemStack getCapsuleWithLiquid(String liquidID) {
+        String filledCapsuleID = liquidToCapsule.get(liquidID);
         if (filledCapsuleID == null) return ItemStack.EMPTY;
         return new ItemStack(filledCapsuleID);
     }

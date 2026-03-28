@@ -6,8 +6,8 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
-//TODO: Implement merging and stacking logic in addStack, ensuring that items with the same ID and compatible metadata are combined according to Hytale's mechanics.
 public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
     public ItemFlux(ItemStack... stacks) {
@@ -47,16 +47,15 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
     }
 
     @Override
-    public ItemFlux addStack(ItemStack... stacks) {
-        if (stacks == null) return this;
-        for (ItemStack stack : stacks) {
-            int index = this.findIndexOfTarget(stack);
-            if (index == -1) {
-                this.stacks.add(stack);
-            } else {
-                ItemStack oldStack = this.stacks.get(index);
-                this.stacks.set(index, new ItemStack(oldStack.getItemId(), oldStack.getQuantity() + stack.getQuantity(), oldStack.getMetadata()));
-            }
+    public ItemFlux addStack(ItemStack stack) {
+        if (stack == null) return this;
+
+        int index = this.findIndexOfTarget(stack);
+        if (index == -1) {
+            this.stacks.add(stack);
+        } else {
+            ItemStack oldStack = this.stacks.get(index);
+            this.stacks.set(index, oldStack.withQuantity(oldStack.getQuantity() + stack.getQuantity()));
         }
         return this;
     }
@@ -78,7 +77,7 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
         for (ItemStack s : stacks) {
             if (s == null) continue;
-            if (!s.isEmpty() || s.getQuantity() > 0) return false;
+            return false;
         }
 
         return true;
@@ -92,6 +91,16 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
     @Override
     public boolean matchesWithIndex(int index, ItemStack reference) {
         return getStack(index).isEquivalentType(reference);
+    }
+
+    public ItemFlux withLimit(long limit) {
+        setTransferLimit(limit);
+        return this;
+    }
+
+    public ItemFlux withValidator(Predicate<ItemStack> validator) {
+        setValidator(validator);
+        return this;
     }
 
     @Override

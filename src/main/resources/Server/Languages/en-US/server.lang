@@ -1,5 +1,7 @@
 customUI.singleLiquidContainer.title = Single Liquid Container
+items.Fluid_Empty.name = Empty
+items.Fluid_Unknown.name = Unknown Liquid
 items.Fluid_Milk.name = Milk
 items.Fluid_Mosshorn_Milk.name = Mosshorn Milk
-items.Barrel_Liquid.name = Liquid Barrel
-items.Barrel_Liquid.description = A barrel can be used to store liquids.
+fluxvault.interaction.container.empty = The container is empty.
+fluxvault.interaction.liquid_container.contains = The container contains {quantity, number} mB of {liquidName}.

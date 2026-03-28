@@ -1,11 +1,8 @@
 package com.benchenssever.fluxvault.liquid.container;
 
-import com.benchenssever.fluxvault.api.FluxType;
-import com.benchenssever.fluxvault.api.IFlux;
-import com.benchenssever.fluxvault.api.IFluxHandler;
-import com.benchenssever.fluxvault.api.IFluxProvider;
+import com.benchenssever.fluxvault.api.*;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
-import com.benchenssever.fluxvault.liquid.interaction.LiquidContainerWindow;
+import com.benchenssever.fluxvault.liquid.interaction.ui.LiquidContainerWindow;
 import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -22,24 +19,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SingleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
     public static final String ID = "SingleLiquidContainerComponent";
     public static final BuilderCodec<SingleLiquidContainerComponent> CODEC = BuilderCodec.builder(SingleLiquidContainerComponent.class, SingleLiquidContainerComponent::new)
-            .append(new KeyedCodec<>("Content", LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent).add()
-            .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity).add()
-            .append(new KeyedCodec<>("CapacityType", Codec.STRING), SingleLiquidContainerComponent::setCapacityType, SingleLiquidContainerComponent::getCapacityType).add()
-            .append(new KeyedCodec<>("AcceptedHazards", Codec.STRING_ARRAY), SingleLiquidContainerComponent::setAcceptedHazards, SingleLiquidContainerComponent::getAcceptedHazards).add()
+            .append(new KeyedCodec<>(AbstractContainer.CONTENT_KEY, LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent)
+            .documentation(LiquidContainer.CONTENT_DOCUMENTATION).add()
+            .append(new KeyedCodec<>(AbstractContainer.CAPACITY_KEY, Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity)
+            .documentation(AbstractContainer.CAPACITY_DOCUMENTATION).add()
+            .append(new KeyedCodec<>(LiquidContainer.ACCEPTED_HAZARDS_KEY, Codec.STRING_ARRAY), SingleLiquidContainerComponent::setAcceptedHazards, SingleLiquidContainerComponent::getAcceptedHazards)
+            .documentation(LiquidContainer.ACCEPTED_HAZARDS_DOCUMENTATION).add()
             .build();
     private final SingleLiquidContainer container;
     private final Map<UUID, LiquidContainerWindow> windows = new ConcurrentHashMap<>();
 
     public SingleLiquidContainerComponent() {
-        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, 10000, "FINITE", new String[0]);
+        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, 10000, new String[0]);
     }
 
-    public SingleLiquidContainerComponent(LiquidStack content, long capacity, String capacityType, String[] supportedTags) {
-        this.container = new SingleLiquidContainer(content, capacity, capacityType, supportedTags);
+    public SingleLiquidContainerComponent(LiquidStack content, long capacity, String[] supportedTags) {
+        this.container = new SingleLiquidContainer(content, capacity, supportedTags);
     }
 
-    public SingleLiquidContainerComponent(long capacity, String capacityType, String[] supportedTags) {
-        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, capacity, capacityType, supportedTags);
+    public SingleLiquidContainerComponent(long capacity, String[] supportedTags) {
+        this.container = new SingleLiquidContainer(LiquidStack.EMPTY, capacity, supportedTags);
     }
 
     public static ComponentType<ChunkStore, SingleLiquidContainerComponent> getComponentType() {
@@ -51,27 +50,19 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
     }
 
     public LiquidStack getContent() {
-        return this.container.getContent(0);
+        return this.container.getContent();
     }
 
     public void setContent(LiquidStack content) {
-        this.container.setContent(0, content);
+        this.container.setContent(content);
     }
 
     public long getCapacity() {
-        return this.container.getContainerCapacity();
+        return this.container.getCapacity();
     }
 
     public void setCapacity(long capacity) {
-        this.container.setContainerCapacity(capacity);
-    }
-
-    public String getCapacityType() {
-        return this.container.getCapacityType();
-    }
-
-    public void setCapacityType(String capacityType) {
-        this.container.setCapacityType(capacityType);
+        this.container.setCapacity(capacity);
     }
 
     public String[] getAcceptedHazards() {
@@ -93,11 +84,11 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
 
     @NullableDecl
     @Override
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Component<ChunkStore> clone() {
         return new SingleLiquidContainerComponent(
                 this.getContent().copy(),
                 this.getCapacity(),
-                this.getCapacityType(),
                 this.getAcceptedHazards()
         );
     }

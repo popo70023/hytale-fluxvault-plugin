@@ -4,8 +4,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 
-import java.util.Objects;
-
 public class LiquidStack {
     public final static LiquidStack EMPTY = new LiquidStack() {
         @Override
@@ -25,24 +23,20 @@ public class LiquidStack {
             .build();
     private String liquidId;
     private long quantity;
-    private transient Liquid liquid;
 
     private LiquidStack() {
         this.liquidId = Liquid.EMPTY_ID;
-        this.liquid = null;
         this.quantity = 0;
     }
 
     private LiquidStack(LiquidStack liquidStack) {
         this.liquidId = liquidStack.getLiquidId();
-        this.liquid = liquidStack.getLiquid();
         this.quantity = liquidStack.getQuantity();
     }
 
     private LiquidStack(String liquidId, long quantity) {
         this.liquidId = liquidId;
         this.quantity = Math.max(0, quantity);
-        refreshLiquidCache();
     }
 
     public static LiquidStack of(String liquidId, long quantity) {
@@ -52,20 +46,12 @@ public class LiquidStack {
         return new LiquidStack(liquidId, quantity);
     }
 
-    public static LiquidStack of(Liquid liquid, long quantity) {
-        if (liquid == null || quantity <= 0) {
-            return EMPTY;
-        }
-        return of(liquid.getId(), quantity);
-    }
-
     public String getLiquidId() {
         return this.liquidId;
     }
 
     private void setLiquidId(String liquidId) {
         this.liquidId = liquidId;
-        refreshLiquidCache();
     }
 
     public long getQuantity() {
@@ -83,13 +69,9 @@ public class LiquidStack {
     }
 
     public Liquid getLiquid() {
-        if (this.liquid == null) refreshLiquidCache();
-        return this.liquid;
-    }
-
-    private void refreshLiquidCache() {
-        this.liquid = Liquid.getLiquidById(this.liquidId);
-        if (this.liquid == null) this.liquid = Liquid.EMPTY;
+        if (this.liquidId.equals(Liquid.EMPTY_ID)) return Liquid.EMPTY;
+        Liquid result = Liquid.getLiquidById(this.liquidId);
+        return result != null ? result : Liquid.UNKNOWN;
     }
 
     public boolean isEmpty() {
@@ -99,12 +81,6 @@ public class LiquidStack {
 
     public LiquidStack copy() {
         return new LiquidStack(this);
-    }
-
-    public boolean isEqual(LiquidStack resource) {
-        if (resource == null) return false;
-        if (this == resource) return true;
-        return Objects.equals(getLiquidId(), resource.getLiquidId()) && getQuantity() == resource.getQuantity();
     }
 
     public boolean isEquivalentType(LiquidStack liquidStack) {

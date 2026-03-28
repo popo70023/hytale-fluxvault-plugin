@@ -1,27 +1,23 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Barrel_Liquid.name",
-    "Description": "server.items.Barrel_Liquid.description"
+    "Name": "server.items.Furniture_Ancient_Barrel.name"
   },
-  "Id": "Liquid Barrel",
-  "MaxStack": 10,
   "PlayerAnimationsId": "Block",
   "Categories": [
     "Furniture.Containers"
   ],
-  "Set": "Furniture_Tavern",
-  "Icon": "Icons/ItemsGenerated/Furniture_Tavern_Barrel.png",
+  "Set": "Furniture_Ancient",
+  "Icon": "Icons/ItemsGenerated/Furniture_Ancient_Barrel.png",
   "BlockType": {
     "BlockParticleSetId": "Wood",
-    "CustomModel": "Blocks/container/Barrel.blockymodel",
+    "CustomModel": "Blocks/Decorative_Sets/Village/Barrel.blockymodel",
     "CustomModelTexture": [
       {
-        "Texture": "Blocks/container/Barrel_Liquid.png",
+        "Texture": "Blocks/Decorative_Sets/Village/Barrel_Ancient.png",
         "Weight": 1
       }
     ],
     "DrawType": "Model",
-    "Flags": {},
     "Gathering": {
       "Soft": {
         "DropList": "Barrels"
@@ -30,14 +26,9 @@
     "HitboxType": "Chest_Small",
     "Material": "Solid",
     "Opacity": "Transparent",
-    "ParticleColor": "#543022",
+    "ParticleColor": "#4e462c",
     "RandomRotation": "YawStep1",
     "Support": {
-      "Up": [
-        {
-          "FaceType": "Branch"
-        }
-      ],
       "Down": [
         {
           "FaceType": "Full"
@@ -53,28 +44,17 @@
         "Interactions": [
           {
             "Type": "FillLiquidContainer",
-            "SimulateOnly": true,
-            "Next": {
-              "Type": "FillLiquidContainer",
-              "Effects": {
-                "ClearSoundEventOnFinish": true,
-                "LocalSoundEventId": "SFX_Water_MoveOut"
-              }
-            },
+            "SimulateOnly": false,
             "Failed": {
               "Type": "DrainLiquidContainer",
-              "SimulateOnly": true,
-              "Next": {
-                "Type": "DrainLiquidContainer",
-                "Effects": {
-                  "ClearSoundEventOnFinish": true,
-                  "LocalSoundEventId": "SFX_Water_MoveIn"
-                }
-              }
-            }
+              "SimulateOnly": false,
+              "CancelOnItemChange": true
+            },
+            "CancelOnItemChange": false
           },
           {
-            "Type": "SingleLiquidContainerInformation"
+            "Type": "SingleLiquidContainerInformation",
+            "CancelOnItemChange": true
           }
         ]
       }
@@ -83,7 +63,6 @@
       "Components": {
         "SingleLiquidContainerComponent": {
           "Capacity": 10000,
-          "CapacityType": "FINITE",
           "AcceptedHazards": []
         }
       }
@@ -102,7 +81,7 @@
       "Furniture"
     ],
     "Family": [
-      "Tavern"
+      "Ancient"
     ]
   },
   "ItemSoundSetId": "ISS_Blocks_Wood"

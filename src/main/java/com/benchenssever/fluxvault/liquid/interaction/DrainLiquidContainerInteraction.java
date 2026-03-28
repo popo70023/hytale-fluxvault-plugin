@@ -4,8 +4,7 @@ import com.benchenssever.fluxvault.api.FluxType;
 import com.benchenssever.fluxvault.api.IFluxHandler;
 import com.benchenssever.fluxvault.liquid.LiquidCapsuleType;
 import com.benchenssever.fluxvault.liquid.LiquidFlux;
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
+import com.benchenssever.fluxvault.util.InteractionUtil;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -26,11 +25,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
     public static final String ID = "DrainLiquidContainer";
     public static final BuilderCodec<DrainLiquidContainerInteraction> CODEC = BuilderCodec.builder(DrainLiquidContainerInteraction.class, DrainLiquidContainerInteraction::new, SimpleBlockInteraction.CODEC)
-            .append(new KeyedCodec<>("SimulateOnly", Codec.BOOLEAN), (interact, val) -> interact.simulateOnly = val, interact -> interact.simulateOnly).add()
             .documentation("Drain a target block's liquid container using a fluid-holding item from the player's hand.")
             .build();
-
-    protected boolean simulateOnly = false;
 
     @Override
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NullableDecl ItemStack itemInHand, @NonNullDecl Vector3i pos, @NonNullDecl CooldownHandler cooldownHandler) {
@@ -38,14 +34,13 @@ public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
         Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
         IFluxHandler<LiquidFlux> handler = InteractionUtil.getFluxHandler(world, pos, FluxType.LIQUID);
         InteractionSyncData state = context.getState();
-        IFluxHandler.FluxAction action = simulateOnly ? IFluxHandler.FluxAction.SIMULATE : IFluxHandler.FluxAction.EXECUTE;
 
         if (player == null || itemInHand == null || itemInHand.isEmpty() || handler == null) {
             state.state = InteractionState.Failed;
             return;
         }
 
-        if (drainWithCapsule(commandBuffer, context, itemInHand, handler, action)) {
+        if (drainWithCapsule(commandBuffer, context, itemInHand, handler)) {
             return;
         }
 
@@ -57,17 +52,15 @@ public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
 
     }
 
-    private boolean drainWithCapsule(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux> handler, IFluxHandler.FluxAction action) {
+    private boolean drainWithCapsule(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, ItemStack itemInHand, IFluxHandler<LiquidFlux> handler) {
         LiquidCapsuleType capsuleType = LiquidCapsuleType.getLiquidCapsuleType(itemInHand);
         if (capsuleType == null || !capsuleType.isEmptyCapsule(itemInHand)) {
             return false;
         }
 
-        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, handler, action);
+        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, handler, IFluxHandler.FluxAction.EXECUTE_EXACT);
         if (resultItem != null) {
-            if (action.execute()) {
-                InteractionUtil.exchangeHeldItem(commandBuffer, context, 1, resultItem);
-            }
+            InteractionUtil.exchangeHeldItem(commandBuffer, context, 1, resultItem);
             return true;
         }
         return false;

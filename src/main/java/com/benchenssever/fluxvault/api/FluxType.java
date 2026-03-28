@@ -7,6 +7,9 @@ import com.benchenssever.fluxvault.liquid.LiquidFlux;
 import com.benchenssever.fluxvault.liquid.LiquidStack;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Identity token binding a Carrier type (F) to its Data type (D).
  * <p>
@@ -17,10 +20,11 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
  * @param <D> The Data type (e.g., {@code LiquidStack}).
  */
 public final class FluxType<F extends IFlux<D>, D> {
+    private static final Map<String, FluxType<?, ?>> REGISTRY = new ConcurrentHashMap<>();
 
-    public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("ITEM", ItemFlux.class, ItemStack.class);
-    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("LIQUID", LiquidFlux.class, LiquidStack.class);
-    public static final FluxType<EnergyFlux, FluxEnergy> FLUX_ENERGY = new FluxType<>("FLUX_ENERGY", EnergyFlux.class, FluxEnergy.class);
+    public static final FluxType<ItemFlux, ItemStack> ITEM = register("ITEM", ItemFlux.class, ItemStack.class);
+    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = register("LIQUID", LiquidFlux.class, LiquidStack.class);
+    public static final FluxType<EnergyFlux, FluxEnergy> FLUX_ENERGY = register("FLUX_ENERGY", EnergyFlux.class, FluxEnergy.class);
 
     private final String name;
     private final Class<F> resourceClass;
@@ -33,38 +37,40 @@ public final class FluxType<F extends IFlux<D>, D> {
     }
 
     /**
+     * Factory method that creates and securely registers a new FluxType into the global registry.
+     * <p>
+     * This guarantees that all instantiated FluxTypes are properly tracked by the system.
+     * </p>
+     * * @param name          The unique identifier name.
+     *
+     * @param resourceClass The Class object of the carrier.
+     * @param dataClass     The Class object of the data payload.
+     * @throws IllegalArgumentException if a type with the same name already exists.
+     */
+    public static <T extends IFlux<V>, V> FluxType<T, V> register(String name, Class<T> resourceClass, Class<V> dataClass) {
+        FluxType<T, V> newType = new FluxType<>(name, resourceClass, dataClass);
+        if (REGISTRY.putIfAbsent(name, newType) != null) {
+            throw new IllegalArgumentException("FluxType already registered with name: " + name);
+        }
+        return newType;
+    }
+
+    /**
+     * Retrieves a registered FluxType by its string identifier.
+     * Used for deserialization and network RPC payload reconstruction.
+     *
+     * @param name The unique identifier name.
+     * @return The FluxType, or null if not found.
+     */
+    public static FluxType<?, ?> getByName(String name) {
+        return REGISTRY.get(name);
+    }
+
+    /**
      * @return The unique identifier name.
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Casts a generic IFlux interface to the concrete carrier type {@code F}.
-     *
-     * @param flux The carrier to cast.
-     * @return The cast carrier.
-     * @throws ClassCastException if the flux is not an instance of {@code F}.
-     */
-    public F castResource(IFlux<D> flux) {
-        if (resourceClass.isInstance(flux)) {
-            return resourceClass.cast(flux);
-        }
-        throw new ClassCastException("Flux type mismatch!");
-    }
-
-    /**
-     * Casts a generic object to the specific data type {@code D}.
-     *
-     * @param data The object to cast.
-     * @return The cast data object.
-     * @throws ClassCastException if the object is not an instance of {@code D}.
-     */
-    public D castData(Object data) {
-        if (dataClass.isInstance(data)) {
-            return dataClass.cast(data);
-        }
-        throw new ClassCastException("Data type mismatch!");
     }
 
     /**

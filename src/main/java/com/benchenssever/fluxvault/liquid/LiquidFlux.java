@@ -5,6 +5,7 @@ import com.benchenssever.fluxvault.api.FluxType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
@@ -21,16 +22,14 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
     }
 
     @Override
-    public LiquidFlux addStack(LiquidStack... stacks) {
-        if (stacks == null) return this;
+    public LiquidFlux addStack(LiquidStack stack) {
+        if (stack == null) return this;
 
-        for (LiquidStack stack : stacks) {
-            int index = this.findIndexOfTarget(stack);
-            if (index == -1) {
-                this.stacks.add(stack);
-            } else {
-                this.stacks.get(index).addQuantity(stack.getQuantity());
-            }
+        int index = this.findIndexOfTarget(stack);
+        if (index == -1) {
+            this.stacks.add(stack);
+        } else {
+            this.stacks.get(index).addQuantity(stack.getQuantity());
         }
         return this;
     }
@@ -66,6 +65,16 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
     @Override
     public boolean matchesWithIndex(int index, LiquidStack reference) {
         return getStack(index).isEquivalentType(reference);
+    }
+
+    public LiquidFlux withLimit(long limit) {
+        setTransferLimit(limit);
+        return this;
+    }
+
+    public LiquidFlux withValidator(Predicate<LiquidStack> validator) {
+        setValidator(validator);
+        return this;
     }
 
     @Override

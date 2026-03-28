@@ -1,9 +1,6 @@
 package com.benchenssever.fluxvault.energy.container;
 
-import com.benchenssever.fluxvault.api.FluxType;
-import com.benchenssever.fluxvault.api.IFlux;
-import com.benchenssever.fluxvault.api.IFluxHandler;
-import com.benchenssever.fluxvault.api.IFluxProvider;
+import com.benchenssever.fluxvault.api.*;
 import com.benchenssever.fluxvault.energy.FluxEnergy;
 import com.benchenssever.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
@@ -17,22 +14,23 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class SingleEnergyContainerComponent implements Component<ChunkStore>, IFluxProvider {
     public static final String ID = "SingleEnergyContainerComponent";
     public static final BuilderCodec<SingleEnergyContainerComponent> CODEC = BuilderCodec.builder(SingleEnergyContainerComponent.class, SingleEnergyContainerComponent::new)
-            .append(new KeyedCodec<>("Content", FluxEnergy.CODEC), SingleEnergyContainerComponent::setContent, SingleEnergyContainerComponent::getContent).add()
-            .append(new KeyedCodec<>("Capacity", Codec.LONG), SingleEnergyContainerComponent::setCapacity, SingleEnergyContainerComponent::getCapacity).add()
-            .append(new KeyedCodec<>("CapacityType", Codec.STRING), SingleEnergyContainerComponent::setCapacityType, SingleEnergyContainerComponent::getCapacityType).add()
+            .append(new KeyedCodec<>(AbstractContainer.CONTENT_KEY, FluxEnergy.CODEC), SingleEnergyContainerComponent::setContent, SingleEnergyContainerComponent::getContent)
+            .documentation(EnergyContainer.CONTENT_DOCUMENTATION).add()
+            .append(new KeyedCodec<>(AbstractContainer.CAPACITY_KEY, Codec.LONG), SingleEnergyContainerComponent::setCapacity, SingleEnergyContainerComponent::getCapacity)
+            .documentation(AbstractContainer.CAPACITY_DOCUMENTATION).add()
             .build();
     private final SingleEnergyContainer container;
 
     public SingleEnergyContainerComponent() {
-        this.container = new SingleEnergyContainer(FluxEnergy.of(0), 10000, "FINITE");
+        this.container = new SingleEnergyContainer(FluxEnergy.of(0), 10000);
     }
 
-    public SingleEnergyContainerComponent(FluxEnergy content, long capacity, String capacityType) {
-        this.container = new SingleEnergyContainer(content, capacity, capacityType);
+    public SingleEnergyContainerComponent(FluxEnergy content, long capacity) {
+        this.container = new SingleEnergyContainer(content, capacity);
     }
 
-    public SingleEnergyContainerComponent(long capacity, String capacityType) {
-        this.container = new SingleEnergyContainer(FluxEnergy.of(0), capacity, capacityType);
+    public SingleEnergyContainerComponent(long capacity) {
+        this.container = new SingleEnergyContainer(FluxEnergy.of(0), capacity);
     }
 
     public static ComponentType<ChunkStore, SingleEnergyContainerComponent> getComponentType() {
@@ -40,27 +38,19 @@ public class SingleEnergyContainerComponent implements Component<ChunkStore>, IF
     }
 
     public FluxEnergy getContent() {
-        return this.container.getContent(0);
+        return this.container.getContent();
     }
 
     public void setContent(FluxEnergy content) {
-        this.container.setContent(0, content);
+        this.container.setContent(content);
     }
 
     public long getCapacity() {
-        return this.container.getContainerCapacity();
+        return this.container.getCapacity();
     }
 
     public void setCapacity(long capacity) {
-        this.container.setContainerCapacity(capacity);
-    }
-
-    public String getCapacityType() {
-        return this.container.getCapacityType();
-    }
-
-    public void setCapacityType(String capacityTypeStr) {
-        this.container.setCapacityType(capacityTypeStr);
+        this.container.setCapacity(capacity);
     }
 
     @NullableDecl
@@ -74,11 +64,11 @@ public class SingleEnergyContainerComponent implements Component<ChunkStore>, IF
 
     @NullableDecl
     @Override
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Component<ChunkStore> clone() {
         return new SingleEnergyContainerComponent(
                 this.getContent().copy(),
-                this.getCapacity(),
-                this.getCapacityType()
+                this.getCapacity()
         );
     }
 }

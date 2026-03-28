@@ -3,21 +3,26 @@ package com.benchenssever.fluxvault.api;
 import javax.annotation.Nullable;
 
 /**
- * Interface for objects capable of providing specific Flux handlers.
+ * The universal capability bridge for objects capable of participating in the Flux logistics network.
  * <p>
- * Implemented by Blocks, Entities, or Components to expose their resource capabilities
- * (e.g., a machine that accepts both Liquid and Energy).
+ * Implemented by Blocks, Entities, or Components to expose their routing and storage capabilities.
+ * A single provider (e.g., an advanced machine) can multiplex multiple handlers (e.g., accepting both Liquid and Energy).
  * </p>
  */
 public interface IFluxProvider {
 
     /**
-     * Retrieves the handler for a specific Flux resource type.
+     * Retrieves the authoritative handler for a specific Flux resource type.
+     * <p>
+     * <b>LIFECYCLE WARNING:</b> The returned handler represents the current logical state of the provider.
+     * Callers should NEVER cache the returned {@code IFluxHandler} long-term across multiple ticks,
+     * as the provider's capabilities may dynamically change (e.g., a machine component being uninstalled).
+     * </p>
      *
-     * @param type The type of resource requested (e.g., {@link FluxType#LIQUID}).
-     * @param <F>  The carrier type.
-     * @param <D>  The data type.
-     * @return The handler instance, or {@code null} if the type is not supported.
+     * @param type The architectural type of the resource requested (e.g., {@link FluxType#LIQUID}).
+     * @param <F>  The carrier payload type.
+     * @param <D>  The underlying data type.
+     * @return The active handler instance ready for SIMULATE/EXECUTE operations, or {@code null} if the requested type is not supported.
      */
     @Nullable
     <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(FluxType<F, D> type);

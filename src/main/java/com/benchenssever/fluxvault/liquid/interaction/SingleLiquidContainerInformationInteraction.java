@@ -1,6 +1,8 @@
 package com.benchenssever.fluxvault.liquid.interaction;
 
+import com.benchenssever.fluxvault.liquid.LiquidStack;
 import com.benchenssever.fluxvault.liquid.container.SingleLiquidContainerComponent;
+import com.benchenssever.fluxvault.util.InteractionUtil;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -30,10 +32,15 @@ public class SingleLiquidContainerInformationInteraction extends SimpleBlockInte
         SingleLiquidContainerComponent containerComp = InteractionUtil.getBlockComponent(world, vector3i, SingleLiquidContainerComponent.getComponentType());
 
         if (player != null && containerComp != null) {
-            if (containerComp.getContent().isEmpty()) {
-                player.sendMessage(Message.raw("The container is empty."));
+            LiquidStack content = containerComp.getContent();
+            if (content.isEmpty()) {
+                player.sendMessage(Message.translation("server.fluxvault.interaction.container.empty"));
             } else {
-                player.sendMessage(Message.raw("The container contains: " + containerComp.getContent().getQuantity() + " mB of " + containerComp.getContent().getLiquidId()));
+                String liquidNameKey = content.getLiquid().getTranslationProperties().getName();
+                Message message = Message.translation("server.fluxvault.interaction.liquid_container.contains")
+                        .param("liquidName", Message.translation(liquidNameKey))
+                        .param("quantity", content.getQuantity());
+                player.sendMessage(message);
             }
         }
 

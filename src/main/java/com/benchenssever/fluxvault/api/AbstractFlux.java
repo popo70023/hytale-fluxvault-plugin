@@ -3,15 +3,15 @@ package com.benchenssever.fluxvault.api;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Base implementation for a Flux carrier backed by a list.
+ * Base abstract implementation for a Flux carrier.
  * <p>
- * This class handles the common list operations (storage, iteration, access) required by {@link IFlux}.
- * Concrete implementations (e.g., LiquidFlux) only need to define resource-specific logic.
+ * This class provides the foundational state (validation rules, transfer limits) required by {@link IFlux}.
+ * It delegates actual data storage and access patterns to internal strategy classes like {@link Bundle} (list-backed)
+ * and {@link Packet} (single-value optimized). Concrete implementations should extend one of these strategies.
  * </p>
  *
  * @param <D> The data type.
@@ -23,7 +23,7 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
 
     @Override
     public int findIndexOfFirstMatchesStack(Predicate<D> validator) {
-        for (int i = 0; i < getStackSize(); i++) {
+        for (int i = 0; i < getStackCount(); i++) {
             if (!isIndexEmpty(i) && validator.test(getStack(i))) {
                 return i;
             }
@@ -41,11 +41,6 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         this.transferLimit = Math.max(0, limit);
     }
 
-    public AbstractFlux<D> withLimit(long limit) {
-        setTransferLimit(limit);
-        return this;
-    }
-
     @Override
     @Nonnull
     public Predicate<D> getValidator() {
@@ -55,16 +50,6 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
     @Override
     public void setValidator(Predicate<D> validator) {
         this.validator = (validator != null) ? validator : _ -> true;
-    }
-
-    public AbstractFlux<D> withValidator(Predicate<D> validator) {
-        setValidator(validator);
-        return this;
-    }
-
-    @Override
-    public Iterator<D> iterator() {
-        return getStacks().iterator();
     }
 
     // =================================================================================
@@ -94,7 +79,7 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         }
 
         @Override
-        public int getStackSize() {
+        public int getStackCount() {
             return stacks.size();
         }
 
@@ -161,7 +146,7 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         }
 
         @Override
-        public int getStackSize() {
+        public int getStackCount() {
             return 1;
         }
 
@@ -170,6 +155,11 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
             return content == null ? Collections.emptyList() : Collections.singletonList(content);
         }
 
+        /**
+         * Convenience method to retrieve the single payload. Equivalent to calling {@code getStack(0)}.
+         *
+         * @return The contained data stack, or null if empty.
+         */
         public D getStack() {
             return getStack(0);
         }
@@ -185,6 +175,11 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
             return matchesWithIndex(0, target) ? 0 : -1;
         }
 
+        /**
+         * Convenience method to replace the single payload. Equivalent to calling {@code setStack(0, content)}.
+         *
+         * @param content The new data stack.
+         */
         public void setContent(D content) {
             setStack(0, content);
         }
@@ -199,6 +194,11 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
             return stack;
         }
 
+        /**
+         * Convenience method to clear the payload. Equivalent to calling {@code removeStack(0)}.
+         *
+         * @return The data stack that was removed.
+         */
         public D removeStack() {
             return removeStack(0);
         }

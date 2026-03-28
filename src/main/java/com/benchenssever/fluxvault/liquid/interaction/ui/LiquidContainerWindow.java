@@ -1,4 +1,4 @@
-package com.benchenssever.fluxvault.liquid.interaction;
+package com.benchenssever.fluxvault.liquid.interaction.ui;
 
 import com.benchenssever.fluxvault.api.IFluxContainer;
 import com.benchenssever.fluxvault.liquid.Liquid;
@@ -27,7 +27,7 @@ public class LiquidContainerWindow extends BlockWindow {
         Item item = blockType.getItem();
         assert item != null;
         this.windowData.addProperty("blockItemId", item.getId());
-        long capacity = fluxContainers.getContainerCapacity();
+        long capacity = fluxContainers.getCapacity();
         this.windowData.addProperty("containerCapacity", capacity);
         for (int i = 0; i < fluxContainers.getContainerMaxSize(); i++) {
             LiquidStack content = fluxContainers.getContent(i);

@@ -3,6 +3,8 @@ package com.benchenssever.fluxvault.energy;
 import com.benchenssever.fluxvault.api.AbstractFlux;
 import com.benchenssever.fluxvault.api.FluxType;
 
+import java.util.function.Predicate;
+
 public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
 
     public EnergyFlux() {
@@ -18,15 +20,13 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
     }
 
     @Override
-    public EnergyFlux addStack(FluxEnergy... stacks) {
-        if (stacks == null) return this;
+    public EnergyFlux addStack(FluxEnergy stack) {
+        if (stack == null) return this;
 
-        for (FluxEnergy stack : stacks) {
-            if (this.content == null || this.content.isEmpty()) {
-                this.content = stack.copy();
-            } else {
-                this.content.addQuantity(stack.getQuantity());
-            }
+        if (this.content == null || this.content.isEmpty()) {
+            this.content = stack.copy();
+        } else {
+            this.content.addQuantity(stack.getQuantity());
         }
         return this;
     }
@@ -50,6 +50,16 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
     @Override
     public boolean matchesWithIndex(int index, FluxEnergy reference) {
         return true;
+    }
+
+    public EnergyFlux withLimit(long limit) {
+        setTransferLimit(limit);
+        return this;
+    }
+
+    public EnergyFlux withValidator(Predicate<FluxEnergy> validator) {
+        setValidator(validator);
+        return this;
     }
 
     @Override

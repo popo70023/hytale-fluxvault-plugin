@@ -1,4 +1,4 @@
-package com.benchenssever.fluxvault.liquid.interaction;
+package com.benchenssever.fluxvault.liquid.interaction.ui;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;

@@ -1,4 +1,4 @@
-package com.benchenssever.fluxvault.liquid.interaction;
+package com.benchenssever.fluxvault.util;
 
 import com.benchenssever.fluxvault.api.FluxType;
 import com.benchenssever.fluxvault.api.IFlux;

@@ -2,14 +2,14 @@
     "Group": "fluxvault",
     "Name": "Flux Vault",
     "Version": "0.1.0",
-    "Description": "A unified storage framework for fluids, energy, and resources.",
+    "Description": "A universal transport protocol and storage framework. Features native support for items, liquids, and energy, while allowing developers to easily route their own custom data.",
     "Authors": [
         {
             "Name": "Ben"
         }
     ],
-    "Website": "https://github.com/popo70023",
-    "ServerVersion": "*",
+    "Website": "https://github.com/popo70023/hytale-fluxvault-plugin",
+    "ServerVersion": "2026.03.26-89796e57b",
     "Dependencies": {
         
     },
