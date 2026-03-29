@@ -1,8 +1,5 @@
 package io.github.popo70023.fluxvault.liquid.interaction;
 
-import io.github.popo70023.fluxvault.liquid.LiquidStack;
-import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
-import io.github.popo70023.fluxvault.util.InteractionUtil;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -16,6 +13,9 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import io.github.popo70023.fluxvault.liquid.LiquidStack;
+import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
+import io.github.popo70023.fluxvault.util.InteractionUtil;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

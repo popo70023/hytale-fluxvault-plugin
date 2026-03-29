@@ -1,11 +1,11 @@
 package io.github.popo70023.fluxvault.api;
 
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import io.github.popo70023.fluxvault.energy.EnergyFlux;
 import io.github.popo70023.fluxvault.energy.FluxEnergy;
 import io.github.popo70023.fluxvault.item.ItemFlux;
 import io.github.popo70023.fluxvault.liquid.LiquidFlux;
 import io.github.popo70023.fluxvault.liquid.LiquidStack;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,8 +1,5 @@
 package io.github.popo70023.fluxvault.liquid.interaction.ui;
 
-import io.github.popo70023.fluxvault.api.IFluxContainer;
-import io.github.popo70023.fluxvault.liquid.Liquid;
-import io.github.popo70023.fluxvault.liquid.LiquidStack;
 import com.google.gson.JsonObject;
 import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
@@ -12,6 +9,9 @@ import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.BlockWindow;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import io.github.popo70023.fluxvault.api.IFluxContainer;
+import io.github.popo70023.fluxvault.liquid.Liquid;
+import io.github.popo70023.fluxvault.liquid.LiquidStack;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;

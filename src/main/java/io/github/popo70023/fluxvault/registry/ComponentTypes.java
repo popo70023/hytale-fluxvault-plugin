@@ -1,10 +1,10 @@
 package io.github.popo70023.fluxvault.registry;
 
-import io.github.popo70023.fluxvault.energy.container.SingleEnergyContainerComponent;
-import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
 import com.hypixel.hytale.component.ComponentRegistryProxy;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import io.github.popo70023.fluxvault.energy.container.SingleEnergyContainerComponent;
+import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
 
 public class ComponentTypes {
     public static ComponentType<ChunkStore, SingleLiquidContainerComponent> SINGLE_LIQUID_CONTAINER;

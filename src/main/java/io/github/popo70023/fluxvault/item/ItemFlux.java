@@ -1,8 +1,8 @@
 package io.github.popo70023.fluxvault.item;
 
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import io.github.popo70023.fluxvault.api.AbstractFlux;
 import io.github.popo70023.fluxvault.api.FluxType;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;

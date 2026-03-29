@@ -1,9 +1,9 @@
 package io.github.popo70023.fluxvault.liquid;
 
-import io.github.popo70023.fluxvault.FluxVaultPlugin;
-import io.github.popo70023.fluxvault.api.IFluxHandler;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import io.github.popo70023.fluxvault.FluxVaultPlugin;
+import io.github.popo70023.fluxvault.api.IFluxHandler;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -21,7 +21,6 @@ public class LiquidCapsuleType {
     private LiquidCapsuleType(String capsuleId, int capacity) {
         this.capsuleId = capsuleId;
         this.capacity = capacity;
-        LiquidCapsuleType.capsuleIdToCapsuleTypes.put(capsuleId, this);
     }
 
     public static LiquidCapsuleType of(String capsuleId, int capacity) {

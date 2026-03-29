@@ -1,6 +1,5 @@
 package io.github.popo70023.fluxvault.registry;
 
-import io.github.popo70023.fluxvault.liquid.LiquidCapsuleType;
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.codec.AssetBuilderCodec;
 import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
@@ -9,6 +8,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import io.github.popo70023.fluxvault.liquid.LiquidCapsuleType;
 
 import java.util.Collection;
 import java.util.Collections;

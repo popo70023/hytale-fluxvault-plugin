@@ -1,16 +1,16 @@
 package io.github.popo70023.fluxvault.registry;
 
+import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
+import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
+import com.hypixel.hytale.server.core.plugin.registry.AssetRegistry;
+import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry;
 import io.github.popo70023.fluxvault.FluxVaultPlugin;
 import io.github.popo70023.fluxvault.liquid.Liquid;
 import io.github.popo70023.fluxvault.liquid.interaction.DrainLiquidContainerInteraction;
 import io.github.popo70023.fluxvault.liquid.interaction.FillLiquidContainerInteraction;
 import io.github.popo70023.fluxvault.liquid.interaction.OpenSingleLiquidContainerInteraction;
 import io.github.popo70023.fluxvault.liquid.interaction.SingleLiquidContainerInformationInteraction;
-import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
-import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
-import com.hypixel.hytale.server.core.plugin.registry.AssetRegistry;
-import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry;
 
 public class FluxAssetRegistry {
     public static HytaleAssetStore<String, Liquid, IndexedLookupTableAssetMap<String, Liquid>> LIQUID_ASSET_STORE = HytaleAssetStore.builder(Liquid.class, new IndexedLookupTableAssetMap<>(Liquid[]::new))

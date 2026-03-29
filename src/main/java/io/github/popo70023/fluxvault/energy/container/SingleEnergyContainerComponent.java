@@ -1,15 +1,14 @@
 package io.github.popo70023.fluxvault.energy.container;
 
-import com.benchenssever.fluxvault.api.*;
-import io.github.popo70023.fluxvault.api.*;
-import io.github.popo70023.fluxvault.energy.FluxEnergy;
-import io.github.popo70023.fluxvault.registry.ComponentTypes;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import io.github.popo70023.fluxvault.api.*;
+import io.github.popo70023.fluxvault.energy.FluxEnergy;
+import io.github.popo70023.fluxvault.registry.ComponentTypes;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 public class SingleEnergyContainerComponent implements Component<ChunkStore>, IFluxProvider {
