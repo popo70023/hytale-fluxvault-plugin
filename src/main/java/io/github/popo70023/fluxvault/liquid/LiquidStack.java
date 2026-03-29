@@ -4,6 +4,8 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 
+import javax.annotation.Nullable;
+
 public class LiquidStack {
     public final static LiquidStack EMPTY = new LiquidStack() {
         @Override
@@ -44,6 +46,10 @@ public class LiquidStack {
             return EMPTY;
         }
         return new LiquidStack(liquidId, quantity);
+    }
+
+    public static boolean isEmpty(@Nullable LiquidStack stack) {
+        return stack == null || stack.isEmpty();
     }
 
     public String getLiquidId() {

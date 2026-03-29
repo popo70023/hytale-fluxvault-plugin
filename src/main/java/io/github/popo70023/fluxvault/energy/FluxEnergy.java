@@ -4,6 +4,8 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 
+import javax.annotation.Nullable;
+
 public class FluxEnergy {
     public static final BuilderCodec<FluxEnergy> CODEC = BuilderCodec.builder(FluxEnergy.class, FluxEnergy::new)
             .append(new KeyedCodec<>("Quantity", Codec.LONG), FluxEnergy::setQuantity, FluxEnergy::getQuantity).add()
@@ -26,6 +28,10 @@ public class FluxEnergy {
 
     public static FluxEnergy of(long quantity) {
         return new FluxEnergy(quantity);
+    }
+
+    public static boolean isEmpty(@Nullable FluxEnergy stack) {
+        return stack == null || stack.isEmpty();
     }
 
     public long getQuantity() {

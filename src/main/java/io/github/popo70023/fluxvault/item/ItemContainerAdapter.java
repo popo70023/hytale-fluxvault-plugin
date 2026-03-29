@@ -21,20 +21,43 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
         ItemFlux resultFlux = new ItemFlux();
         if (resource.isEmpty()) return resultFlux;
 
+        if (action.exact()) {
+            ItemContainer simContainer = this.container.clone();
+            for (int i = 0; i < resource.getStackCount(); i++) {
+                if (resource.isIndexEmpty(i)) continue;
+                ItemStack insertStack = resource.getStack(i);
+                int insertQuantity = (int) Math.min(insertStack.getQuantity(), resource.getTransferLimit());
+                if (insertQuantity <= 0) continue;
+
+                ItemStackTransaction tx = simContainer.addItemStack(insertStack.withQuantity(insertQuantity), false, false, true);
+                int remainder = ItemStack.isEmpty(tx.getRemainder()) ? 0 : tx.getRemainder().getQuantity();
+
+                if (remainder > 0) {
+                    return new ItemFlux();
+                }
+            }
+        }
+
         ItemContainer targetContainer = action.execute() ? this.container : this.container.clone();
 
-        for (int i = 0; i < resource.getStackCount(); i++) {
-            if (resource.isIndexEmpty(i)) continue;
+        for (int i = 0; i < resource.getStackCount(); ) {
+            if (resource.isIndexEmpty(i)) {
+                i++;
+                continue;
+            }
 
             ItemStack insertStack = resource.getStack(i);
-            long limit = resource.getTransferLimit();
-            int insertQuantity = (int) Math.min(insertStack.getQuantity(), limit);
+            int insertQuantity = (int) Math.min(insertStack.getQuantity(), resource.getTransferLimit());
 
-            if (insertQuantity <= 0) continue;
+            if (insertQuantity <= 0) {
+                i++;
+                continue;
+            }
 
             ItemStack toInsert = insertStack.withQuantity(insertQuantity);
-
             ItemStackTransaction tx = targetContainer.addItemStack(toInsert, false, false, true);
+
+            boolean elementRemoved = false;
 
             if (tx.succeeded()) {
                 int remainder = ItemStack.isEmpty(tx.getRemainder()) ? 0 : tx.getRemainder().getQuantity();
@@ -45,12 +68,17 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
                         int remainingQuantity = insertStack.getQuantity() - actuallyInserted;
                         if (remainingQuantity <= 0) {
                             resource.removeStack(i);
+                            elementRemoved = true;
                         } else {
                             resource.setStack(i, insertStack.withQuantity(remainingQuantity));
                         }
                     }
                     resultFlux.addStack(insertStack.withQuantity(actuallyInserted));
                 }
+            }
+
+            if (!elementRemoved) {
+                i++;
             }
         }
 
@@ -63,27 +91,60 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
         ItemFlux resultFlux = new ItemFlux();
         if (this.container.isEmpty() || requestResources.isEmpty()) return resultFlux;
 
+        if (action.exact()) {
+            ItemContainer simContainer = this.container.clone();
+            for (int r = 0; r < requestResources.getStackCount(); r++) {
+                if (requestResources.isIndexEmpty(r)) continue;
+                ItemStack requestStack = requestResources.getStack(r);
+                int neededQuantity = (int) Math.min(requestStack.getQuantity(), requestResources.getTransferLimit());
+                if (neededQuantity <= 0) continue;
+
+                int extracted = 0;
+                for (short slot = 0; slot < simContainer.getCapacity(); slot++) {
+                    ItemStack slotStack = simContainer.getItemStack(slot);
+                    if (ItemStack.isEmpty(slotStack)) continue;
+
+                    if (requestResources.matchesWithFlux(slotStack)) {
+                        int toTake = Math.min(slotStack.getQuantity(), neededQuantity - extracted);
+                        ItemStackSlotTransaction tx = simContainer.removeItemStackFromSlot(slot, toTake);
+
+                        if (tx.succeeded()) {
+                            extracted += toTake;
+                            if (extracted >= neededQuantity) break;
+                        }
+                    }
+                }
+
+                if (extracted < neededQuantity) {
+                    return new ItemFlux();
+                }
+            }
+        }
+
         ItemContainer targetContainer = action.execute() ? this.container : this.container.clone();
 
-        for (int r = 0; r < requestResources.getStackCount(); r++) {
-            if (requestResources.isIndexEmpty(r)) continue;
+        for (int r = 0; r < requestResources.getStackCount(); ) {
+            if (requestResources.isIndexEmpty(r)) {
+                r++;
+                continue;
+            }
 
             ItemStack requestStack = requestResources.getStack(r);
-            long limit = requestResources.getTransferLimit();
-            int remainingToExtract = (int) Math.min(requestStack.getQuantity(), limit);
+            int remainingToExtract = (int) Math.min(requestStack.getQuantity(), requestResources.getTransferLimit());
 
-            if (remainingToExtract <= 0) continue;
+            if (remainingToExtract <= 0) {
+                r++;
+                continue;
+            }
 
             int totalExtractedForThisRequest = 0;
 
             for (short slot = 0; slot < targetContainer.getCapacity(); slot++) {
                 ItemStack slotStack = targetContainer.getItemStack(slot);
-
                 if (ItemStack.isEmpty(slotStack)) continue;
 
                 if (requestResources.matchesWithFlux(slotStack)) {
                     int extractable = Math.min(slotStack.getQuantity(), remainingToExtract);
-
                     ItemStackSlotTransaction tx = targetContainer.removeItemStackFromSlot(slot, extractable);
 
                     if (tx.succeeded()) {
@@ -97,13 +158,19 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
                 }
             }
 
+            boolean elementRemoved = false;
             if (action.execute() && totalExtractedForThisRequest > 0) {
                 int remainingQuantity = requestStack.getQuantity() - totalExtractedForThisRequest;
                 if (remainingQuantity <= 0) {
                     requestResources.removeStack(r);
+                    elementRemoved = true;
                 } else {
                     requestResources.setStack(r, requestStack.withQuantity(remainingQuantity));
                 }
+            }
+
+            if (!elementRemoved) {
+                r++;
             }
         }
 

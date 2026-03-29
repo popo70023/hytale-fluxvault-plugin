@@ -19,7 +19,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
 import io.github.popo70023.fluxvault.liquid.interaction.ui.LiquidContainerWindow;
 import io.github.popo70023.fluxvault.liquid.interaction.ui.SingleLiquidContainerUIPage;
-import io.github.popo70023.fluxvault.util.InteractionUtil;
+import io.github.popo70023.fluxvault.util.FluxUtil;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
@@ -38,7 +38,7 @@ public class OpenSingleLiquidContainerInteraction extends SimpleBlockInteraction
         Store<EntityStore> store = ref.getStore();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
         PlayerRef playerRef = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
-        SingleLiquidContainerComponent containerComp = InteractionUtil.getBlockComponent(world, pos, SingleLiquidContainerComponent.getComponentType());
+        SingleLiquidContainerComponent containerComp = FluxUtil.getBlockComponent(world, pos, SingleLiquidContainerComponent.getComponentType());
         UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
         BlockType blockType = world.getBlockType(pos.x, pos.y, pos.z);
         UUID uuid = uuidComponent.getUuid();

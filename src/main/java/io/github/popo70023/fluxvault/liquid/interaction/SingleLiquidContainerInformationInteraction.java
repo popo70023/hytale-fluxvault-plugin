@@ -15,7 +15,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.liquid.LiquidStack;
 import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
-import io.github.popo70023.fluxvault.util.InteractionUtil;
+import io.github.popo70023.fluxvault.util.FluxUtil;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
@@ -29,7 +29,7 @@ public class SingleLiquidContainerInformationInteraction extends SimpleBlockInte
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType interactionType, @NonNullDecl InteractionContext interactionContext, @NullableDecl ItemStack itemStack, @NonNullDecl Vector3i vector3i, @NonNullDecl CooldownHandler cooldownHandler) {
         Ref<EntityStore> ref = interactionContext.getEntity();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
-        SingleLiquidContainerComponent containerComp = InteractionUtil.getBlockComponent(world, vector3i, SingleLiquidContainerComponent.getComponentType());
+        SingleLiquidContainerComponent containerComp = FluxUtil.getBlockComponent(world, vector3i, SingleLiquidContainerComponent.getComponentType());
 
         if (player != null && containerComp != null) {
             LiquidStack content = containerComp.getContent();

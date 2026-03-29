@@ -18,37 +18,13 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
         super(stacks);
     }
 
-    /**
-     * Creates a deep copy of a Hytale ItemStack.
-     * <p>
-     * Preserves strict null/empty states as per implementation requirements.
-     * </p>
-     *
-     * @param original The stack to copy.
-     * @return A new independent ItemStack, ItemStack.EMPTY, or null.
-     */
-    public static ItemStack copyStack(ItemStack original) {
-        if (original == null) return null;
-        if (original.isEmpty()) return ItemStack.EMPTY;
-        ItemStack newStack = new ItemStack(
-                original.getItemId(),
-                original.getQuantity(),
-                original.getDurability(),
-                original.getMaxDurability(),
-                original.getMetadata()
-        );
-        newStack.setOverrideDroppedItemAnimation(original.getOverrideDroppedItemAnimation());
-
-        return newStack;
-    }
-
     public static FluxType<ItemFlux, ItemStack> getFluxType() {
         return FluxType.ITEM;
     }
 
     @Override
     public ItemFlux addStack(ItemStack stack) {
-        if (stack == null) return this;
+        if (ItemStack.isEmpty(stack)) return this;
 
         int index = this.findIndexOfTarget(stack);
         if (index == -1) {
@@ -76,8 +52,7 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
         if (stacks.isEmpty()) return true;
 
         for (ItemStack s : stacks) {
-            if (s == null) continue;
-            return false;
+            if (!ItemStack.isEmpty(s)) return false;
         }
 
         return true;
@@ -85,12 +60,12 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
     @Override
     public boolean isIndexEmpty(int index) {
-        return getStack(index) == null || getStacks().isEmpty();
+        return ItemStack.isEmpty(getStack(index));
     }
 
     @Override
     public boolean matchesWithIndex(int index, ItemStack reference) {
-        return getStack(index).isEquivalentType(reference);
+        return ItemStack.isEquivalentType(getStack(index), reference);
     }
 
     public ItemFlux withLimit(long limit) {
@@ -105,11 +80,6 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
     @Override
     public ItemFlux copy() {
-        List<ItemStack> newStacks = new ArrayList<>(stacks.size());
-
-        for (ItemStack s : stacks) {
-            newStacks.add(copyStack(s));
-        }
-        return new ItemFlux(newStacks);
+        return new ItemFlux(new ArrayList<>(this.stacks));
     }
 }
