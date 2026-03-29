@@ -5,7 +5,7 @@
     "Description": "A universal transport protocol and storage framework. Features native support for items, liquids, and energy, while allowing developers to easily route their own custom data.",
     "Authors": [
         {
-            "Name": "Ben"
+            "Name": "Ben (popo70023)"
         }
     ],
     "Website": "https://github.com/popo70023/hytale-fluxvault-plugin",
@@ -17,6 +17,6 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "com.benchenssever.fluxvault.FluxVaultPlugin",
+    "Main": "io.github.popo70023.fluxvault.FluxVaultPlugin",
     "IncludesAssetPack": true
 }
