@@ -1,6 +1,13 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.liquid.container;
 
 import io.github.popo70023.fluxvault.api.AbstractContainer;
+import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.liquid.LiquidFlux;
 import io.github.popo70023.fluxvault.liquid.LiquidStack;
 
 import java.util.Arrays;
@@ -78,6 +85,10 @@ public abstract class LiquidContainer extends AbstractContainer<LiquidStack> {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    public boolean matchesFluxType(FluxType<?, ?> fluxType) {
+        return LiquidFlux.class.isAssignableFrom(fluxType.getResourceClass());
     }
 
     public abstract static class FixedCapacity extends LiquidContainer {

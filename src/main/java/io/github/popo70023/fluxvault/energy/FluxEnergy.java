@@ -1,8 +1,14 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.energy;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.server.core.asset.type.item.config.ItemTranslationProperties;
 
 import javax.annotation.Nullable;
 
@@ -11,6 +17,7 @@ public class FluxEnergy {
             .append(new KeyedCodec<>("Quantity", Codec.LONG), FluxEnergy::setQuantity, FluxEnergy::getQuantity).add()
             .build();
 
+    public static final ItemTranslationProperties FLUX_ENERGY_TRANSLATION = new ItemTranslationProperties("server.fluxvault.flux_energy.name", "server.fluxvault.flux_energy.description");
     private long quantity;
 
     /**

@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.api;
 
 import com.hypixel.hytale.protocol.BlockFace;
@@ -23,14 +28,37 @@ public interface IFluxProvider {
      * as the provider's capabilities may dynamically change (e.g., a machine component being uninstalled).
      * </p>
      *
-     * @param type The architectural type of the resource requested (e.g., {@link FluxType#LIQUID}).
-     * @param side The physical direction/face from which the provider is being accessed (e.g., {@link BlockFace#Up}).
-     *             Must be {@link BlockFace#None} if the access is internal, dimensionless (e.g., an Item in inventory),
-     *             or requesting the global/default handler. STRICTLY NON-NULL.
-     * @param <F>  The carrier payload type.
-     * @param <D>  The underlying data type.
+     * @param type   The architectural type of the resource requested (e.g., {@link FluxType#LIQUID}).
+     * @param side   The physical direction/face from which the provider is being accessed (e.g., {@link BlockFace#Up}).
+     *               Must be {@link BlockFace#None} if the access is internal, dimensionless (e.g., an Item in inventory),
+     *               or requesting the global/default handler. STRICTLY NON-NULL.
+     * @param access The intended operation (FILL or DRAIN) the caller wishes to perform.
+     *               Used to evaluate physical compatibility before a connection is established
+     *               (e.g., an output-only face returning null for a FILL request to prevent pipe connection).
+     *               STRICTLY NON-NULL.
+     * @param <F>    The carrier payload type.
+     * @param <D>    The underlying data type.
      * @return The active handler instance ready for SIMULATE/EXECUTE operations, or {@code null} if the requested type/side is not supported.
      */
     @Nullable
-    <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(@Nonnull FluxType<F, D> type, @Nonnull BlockFace side);
+    <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(@Nonnull FluxType<F, D> type, @Nonnull BlockFace side, @Nonnull FluxAccess access);
+
+    /**
+     * Defines the operational intent of a network connection or query.
+     * <p>
+     * Used by providers to determine if a physical or logical connection should be permitted based on the caller's objective.
+     * </p>
+     */
+    enum FluxAccess {
+        FILL,
+        DRAIN;
+
+        public boolean fill() {
+            return this == FILL;
+        }
+
+        public boolean drain() {
+            return this == DRAIN;
+        }
+    }
 }

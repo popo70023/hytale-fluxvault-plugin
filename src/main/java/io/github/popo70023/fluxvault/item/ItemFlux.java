@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.item;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -11,7 +16,7 @@ import java.util.function.Predicate;
 public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
 
     public ItemFlux(ItemStack... stacks) {
-        super(stacks);
+        super(new ArrayList<>(List.of(stacks)));
     }
 
     public ItemFlux(List<ItemStack> stacks) {

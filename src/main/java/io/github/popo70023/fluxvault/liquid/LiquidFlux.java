@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.liquid;
 
 import io.github.popo70023.fluxvault.api.AbstractFlux;
@@ -10,7 +15,7 @@ import java.util.function.Predicate;
 public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
     public LiquidFlux(LiquidStack... stacks) {
-        super(stacks);
+        super(new ArrayList<>(List.of(stacks)));
     }
 
     public LiquidFlux(List<LiquidStack> stacks) {
@@ -19,6 +24,14 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
     public static FluxType<LiquidFlux, LiquidStack> getFluxType() {
         return FluxType.LIQUID;
+    }
+
+    public static LiquidFlux copyOf(LiquidStack... stacks) {
+        List<LiquidStack> copies = new ArrayList<>(stacks.length);
+        for (LiquidStack s : stacks) {
+            if (s != null) copies.add(s.copy());
+        }
+        return new LiquidFlux(copies);
     }
 
     @Override

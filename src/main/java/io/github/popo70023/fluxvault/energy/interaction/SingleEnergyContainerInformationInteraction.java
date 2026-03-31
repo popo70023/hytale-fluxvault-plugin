@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
-package io.github.popo70023.fluxvault.liquid.interaction;
+package io.github.popo70023.fluxvault.energy.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -18,32 +18,31 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import io.github.popo70023.fluxvault.liquid.LiquidStack;
-import io.github.popo70023.fluxvault.liquid.component.SimpleLiquidContainerComponent;
+import io.github.popo70023.fluxvault.energy.FluxEnergy;
+import io.github.popo70023.fluxvault.energy.component.SimpleEnergyContainerComponent;
 import io.github.popo70023.fluxvault.util.FluxUtil;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-public class SingleLiquidContainerInformationInteraction extends SimpleBlockInteraction {
-    public static final String ID = "SingleLiquidContainerInformation";
-    public static final BuilderCodec<SingleLiquidContainerInformationInteraction> CODEC = BuilderCodec.builder(SingleLiquidContainerInformationInteraction.class, SingleLiquidContainerInformationInteraction::new, SimpleBlockInteraction.CODEC)
-            .documentation("Send liquid container interaction to player.")
+public class SingleEnergyContainerInformationInteraction extends SimpleBlockInteraction {
+    public static final String ID = "SingleEnergyContainerInformation";
+    public static final BuilderCodec<SingleEnergyContainerInformationInteraction> CODEC = BuilderCodec.builder(SingleEnergyContainerInformationInteraction.class, SingleEnergyContainerInformationInteraction::new, SimpleBlockInteraction.CODEC)
+            .documentation("Send energy container interaction to player.")
             .build();
 
     @Override
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType interactionType, @NonNullDecl InteractionContext interactionContext, @NullableDecl ItemStack itemStack, @NonNullDecl Vector3i vector3i, @NonNullDecl CooldownHandler cooldownHandler) {
         Ref<EntityStore> ref = interactionContext.getEntity();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
-        SimpleLiquidContainerComponent containerComp = FluxUtil.getBlockComponent(world, vector3i, SimpleLiquidContainerComponent.getComponentType());
+        SimpleEnergyContainerComponent containerComp = FluxUtil.getBlockComponent(world, vector3i, SimpleEnergyContainerComponent.getComponentType());
 
         if (player != null && containerComp != null) {
-            LiquidStack content = containerComp.getContent();
+            FluxEnergy content = containerComp.getContent();
             if (content.isEmpty()) {
                 player.sendMessage(Message.translation("server.fluxvault.interaction.container.empty"));
             } else {
-                String liquidNameKey = content.getLiquid().getTranslationProperties().getName();
-                Message message = Message.translation("server.fluxvault.interaction.liquid_container.contains")
-                        .param("liquidName", Message.translation(liquidNameKey))
+                Message message = Message.translation("server.fluxvault.interaction.energy_container.contains")
+                        .param("energyName", Message.translation(FluxEnergy.FLUX_ENERGY_TRANSLATION.getName()))
                         .param("quantity", content.getQuantity());
                 player.sendMessage(message);
             }

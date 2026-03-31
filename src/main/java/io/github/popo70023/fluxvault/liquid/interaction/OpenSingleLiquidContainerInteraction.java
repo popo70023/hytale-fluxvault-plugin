@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.liquid.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -16,7 +21,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.cli
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainerComponent;
+import io.github.popo70023.fluxvault.liquid.component.SimpleLiquidContainerComponent;
 import io.github.popo70023.fluxvault.liquid.interaction.ui.LiquidContainerWindow;
 import io.github.popo70023.fluxvault.liquid.interaction.ui.SingleLiquidContainerUIPage;
 import io.github.popo70023.fluxvault.util.FluxUtil;
@@ -29,7 +34,7 @@ import java.util.UUID;
 public class OpenSingleLiquidContainerInteraction extends SimpleBlockInteraction {
     public static final String ID = "OpenSingleLiquidContainer";
     public static final BuilderCodec<OpenSingleLiquidContainerInteraction> CODEC = BuilderCodec.builder(OpenSingleLiquidContainerInteraction.class, OpenSingleLiquidContainerInteraction::new, SimpleBlockInteraction.CODEC)
-            .documentation("Open the liquid container GUI.")
+            .documentation("*wip* Open the liquid container GUI.")
             .build();
 
     @Override
@@ -38,7 +43,7 @@ public class OpenSingleLiquidContainerInteraction extends SimpleBlockInteraction
         Store<EntityStore> store = ref.getStore();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
         PlayerRef playerRef = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
-        SingleLiquidContainerComponent containerComp = FluxUtil.getBlockComponent(world, pos, SingleLiquidContainerComponent.getComponentType());
+        SimpleLiquidContainerComponent containerComp = FluxUtil.getBlockComponent(world, pos, SimpleLiquidContainerComponent.getComponentType());
         UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
         BlockType blockType = world.getBlockType(pos.x, pos.y, pos.z);
         UUID uuid = uuidComponent.getUuid();

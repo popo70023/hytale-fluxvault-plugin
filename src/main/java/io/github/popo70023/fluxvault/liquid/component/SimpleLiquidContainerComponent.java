@@ -1,4 +1,9 @@
-package io.github.popo70023.fluxvault.liquid.container;
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
+package io.github.popo70023.fluxvault.liquid.component;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -9,6 +14,8 @@ import com.hypixel.hytale.protocol.BlockFace;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import io.github.popo70023.fluxvault.api.*;
 import io.github.popo70023.fluxvault.liquid.LiquidStack;
+import io.github.popo70023.fluxvault.liquid.container.LiquidContainer;
+import io.github.popo70023.fluxvault.liquid.container.SingleLiquidContainer;
 import io.github.popo70023.fluxvault.liquid.interaction.ui.LiquidContainerWindow;
 import io.github.popo70023.fluxvault.registry.ComponentTypes;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -18,33 +25,33 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SingleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
+public class SimpleLiquidContainerComponent implements Component<ChunkStore>, IFluxProvider {
     public static final String ID = "SingleLiquidContainerComponent";
-    public static final BuilderCodec<SingleLiquidContainerComponent> CODEC = BuilderCodec.builder(SingleLiquidContainerComponent.class, SingleLiquidContainerComponent::new)
-            .append(new KeyedCodec<>(AbstractContainer.CONTENT_KEY, LiquidStack.CODEC), SingleLiquidContainerComponent::setContent, SingleLiquidContainerComponent::getContent)
+    public static final BuilderCodec<SimpleLiquidContainerComponent> CODEC = BuilderCodec.builder(SimpleLiquidContainerComponent.class, SimpleLiquidContainerComponent::new)
+            .append(new KeyedCodec<>(AbstractContainer.CONTENT_KEY, LiquidStack.CODEC), SimpleLiquidContainerComponent::setContent, SimpleLiquidContainerComponent::getContent)
             .documentation(LiquidContainer.CONTENT_DOCUMENTATION).add()
-            .append(new KeyedCodec<>(AbstractContainer.CAPACITY_KEY, Codec.LONG), SingleLiquidContainerComponent::setCapacity, SingleLiquidContainerComponent::getCapacity)
+            .append(new KeyedCodec<>(AbstractContainer.CAPACITY_KEY, Codec.LONG), SimpleLiquidContainerComponent::setCapacity, SimpleLiquidContainerComponent::getCapacity)
             .documentation(AbstractContainer.CAPACITY_DOCUMENTATION).add()
-            .append(new KeyedCodec<>(LiquidContainer.ACCEPTED_HAZARDS_KEY, Codec.STRING_ARRAY), SingleLiquidContainerComponent::setAcceptedHazards, SingleLiquidContainerComponent::getAcceptedHazards)
+            .append(new KeyedCodec<>(LiquidContainer.ACCEPTED_HAZARDS_KEY, Codec.STRING_ARRAY), SimpleLiquidContainerComponent::setAcceptedHazards, SimpleLiquidContainerComponent::getAcceptedHazards)
             .documentation(LiquidContainer.ACCEPTED_HAZARDS_DOCUMENTATION).add()
             .build();
     private final SingleLiquidContainer container;
     private final Map<UUID, LiquidContainerWindow> windows = new ConcurrentHashMap<>();
 
-    public SingleLiquidContainerComponent() {
+    public SimpleLiquidContainerComponent() {
         this.container = new SingleLiquidContainer(LiquidStack.EMPTY, 10000, new String[0]);
     }
 
-    public SingleLiquidContainerComponent(LiquidStack content, long capacity, String[] supportedTags) {
+    public SimpleLiquidContainerComponent(LiquidStack content, long capacity, String[] supportedTags) {
         this.container = new SingleLiquidContainer(content, capacity, supportedTags);
     }
 
-    public SingleLiquidContainerComponent(long capacity, String[] supportedTags) {
+    public SimpleLiquidContainerComponent(long capacity, String[] supportedTags) {
         this.container = new SingleLiquidContainer(LiquidStack.EMPTY, capacity, supportedTags);
     }
 
-    public static ComponentType<ChunkStore, SingleLiquidContainerComponent> getComponentType() {
-        return ComponentTypes.SINGLE_LIQUID_CONTAINER;
+    public static ComponentType<ChunkStore, SimpleLiquidContainerComponent> getComponentType() {
+        return ComponentTypes.SIMPLE_LIQUID_CONTAINER;
     }
 
     public SingleLiquidContainer getContainer() {
@@ -77,9 +84,9 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
 
     @NullableDecl
     @Override
-    public <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(@NonNullDecl FluxType<F, D> type, @NonNullDecl BlockFace side) {
-        if (type == FluxType.LIQUID) {
-            return type.castHandler(this.container);
+    public <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(@NonNullDecl FluxType<F, D> type, @NonNullDecl BlockFace side, @NonNullDecl FluxAccess access) {
+        if (container.matchesFluxType(type)) {
+            return type.castHandler(container);
         }
         return null;
     }
@@ -88,7 +95,7 @@ public class SingleLiquidContainerComponent implements Component<ChunkStore>, IF
     @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Component<ChunkStore> clone() {
-        return new SingleLiquidContainerComponent(
+        return new SimpleLiquidContainerComponent(
                 this.getContent().copy(),
                 this.getCapacity(),
                 this.getAcceptedHazards()

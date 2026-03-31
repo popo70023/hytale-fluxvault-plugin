@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.energy;
 
 import io.github.popo70023.fluxvault.api.AbstractFlux;
@@ -15,6 +20,14 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
         super(content);
     }
 
+    public static EnergyFlux copyOf(FluxEnergy... contents) {
+        FluxEnergy allContent = FluxEnergy.of(0);
+        for (FluxEnergy content : contents) {
+            allContent.addQuantity(content.getQuantity());
+        }
+        return new EnergyFlux(allContent);
+    }
+
     public static FluxType<EnergyFlux, FluxEnergy> getFluxType() {
         return FluxType.FLUX_ENERGY;
     }
@@ -23,10 +36,10 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
     public EnergyFlux addStack(FluxEnergy stack) {
         if (stack == null) return this;
 
-        if (this.content == null || this.content.isEmpty()) {
-            this.content = stack.copy();
+        if (content == null || content.isEmpty()) {
+            content = stack;
         } else {
-            this.content.addQuantity(stack.getQuantity());
+            content.addQuantity(stack.getQuantity());
         }
         return this;
     }
@@ -43,12 +56,12 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
     }
 
     @Override
-    public boolean isIndexEmpty(int index) {
-        return getStack(index) == null || getStacks().isEmpty();
+    public boolean isContentEmpty() {
+        return content == null || content.isEmpty();
     }
 
     @Override
-    public boolean matchesWithIndex(int index, FluxEnergy reference) {
+    public boolean matchesWithContent(FluxEnergy reference) {
         return true;
     }
 
@@ -64,7 +77,7 @@ public class EnergyFlux extends AbstractFlux.Packet<FluxEnergy> {
 
     @Override
     public EnergyFlux copy() {
-        return new EnergyFlux(this.content == null ? null : this.content.copy());
+        return new EnergyFlux(content == null ? null : content.copy());
     }
 
     @Override

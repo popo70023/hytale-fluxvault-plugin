@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault;
 
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -30,5 +35,9 @@ public class FluxVaultPlugin extends JavaPlugin {
     protected void start() {
         LOGGER.atInfo().log("Starting plugin " + this.getName());
         FluxAssetRegistry.RegistryAtStart(this);
+    }
+
+    @Override
+    protected void shutdown() {
     }
 }

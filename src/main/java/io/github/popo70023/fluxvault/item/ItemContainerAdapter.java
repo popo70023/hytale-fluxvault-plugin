@@ -1,9 +1,15 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.item;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
+import io.github.popo70023.fluxvault.api.FluxType;
 import io.github.popo70023.fluxvault.api.IFluxHandler;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
@@ -13,6 +19,11 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
 
     public ItemContainerAdapter(ItemContainer container) {
         this.container = container;
+    }
+
+    @Override
+    public boolean matchesFluxType(FluxType<?, ?> fluxType) {
+        return ItemFlux.class.isAssignableFrom(fluxType.getResourceClass());
     }
 
     @NonNullDecl

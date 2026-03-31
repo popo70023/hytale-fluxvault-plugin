@@ -5,10 +5,13 @@
     "Description": "A universal transport protocol and storage framework. Features native support for items, liquids, and energy, while allowing developers to easily route their own custom data.",
     "Authors": [
         {
-            "Name": "Ben (popo70023)"
+            "Name": "Ben (popo70023)",
+            "Email": "popo70023@gmail.com",
+            "Url": "https://github.com/popo70023"
         }
     ],
-    "Website": "https://github.com/popo70023/hytale-fluxvault-plugin",
+    "Website": "https://legacy.curseforge.com/hytale/mods/flux-vault",
+    "Main": "io.github.popo70023.fluxvault.FluxVaultPlugin",
     "ServerVersion": "2026.03.26-89796e57b",
     "Dependencies": {
         
@@ -16,7 +19,12 @@
     "OptionalDependencies": {
         
     },
+    "LoadBefore": {
+        
+    },
     "DisabledByDefault": false,
-    "Main": "io.github.popo70023.fluxvault.FluxVaultPlugin",
-    "IncludesAssetPack": true
+    "IncludesAssetPack": true,
+    "SubPlugins": [
+        
+    ]
 }

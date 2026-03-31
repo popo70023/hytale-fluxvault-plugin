@@ -1,0 +1,43 @@
+{
+  "BlockType": {
+    "Textures": [
+      {
+        "All": "BlockTextures/Infinite_Energy_Block.png"
+      }
+    ],
+    "Material": "Solid",
+    "BlockParticleSetId": "Metal",
+    "ParticleColor": "#fca207",
+    "BlockEntity": {
+      "Components": {
+        "CreativeEnergyComponent": {
+          "IsVoid": false
+        }
+      }
+    },
+    "BlockSoundSetId": "Metal"
+  },
+  "IconProperties": {
+    "Scale": 0.58823,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Translation": [
+      0,
+      -13.5
+    ]
+  },
+  "MaxStack": 100,
+  "Categories": [
+    "Furniture.Containers"
+  ],
+  "TranslationProperties": {
+    "Name": "server.items.Infinite_Energy_Block.name",
+    "Description": "server.items.Infinite_Energy_Block.description"
+  },
+  "PlayerAnimationsId": "Block",
+  "Icon": "Icons/ItemsGenerated/Infinite_Energy_Block.png",
+  "ItemSoundSetId": "ISS_Items_Metal"
+}

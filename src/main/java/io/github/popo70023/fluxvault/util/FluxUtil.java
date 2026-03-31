@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.util;
 
 import com.hypixel.hytale.component.*;
@@ -16,7 +21,7 @@ import io.github.popo70023.fluxvault.api.IFluxProvider;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FluxUtil {
+public final class FluxUtil {
 
     private FluxUtil() {
     }
@@ -32,14 +37,10 @@ public class FluxUtil {
             Ref<ChunkStore> blockRef = blockComponentChunk.getEntityReference(blockIndex);
 
             if (blockRef != null && blockRef.isValid()) {
-                BlockModule.BlockStateInfo blockStateInfoComponent = blockRef.getStore().getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
+                BlockModule.BlockStateInfo stateInfo = blockRef.getStore().getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
 
-                if (blockStateInfoComponent != null) {
-                    Ref<ChunkStore> chunkRef = blockStateInfoComponent.getChunkRef();
-
-                    if (chunkRef.isValid()) {
-                        return chunkStore.getStore().getComponent(blockRef, componentType);
-                    }
+                if (stateInfo != null && stateInfo.getChunkRef().isValid()) {
+                    return chunkStore.getStore().getComponent(blockRef, componentType);
                 }
             }
         }
@@ -47,7 +48,7 @@ public class FluxUtil {
     }
 
     @Nullable
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, @Nonnull BlockFace side) {
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, @Nonnull BlockFace side, @Nonnull IFluxProvider.FluxAccess access) {
         ChunkStore chunkStore = world.getChunkStore();
         long chunkIndex = ChunkUtil.indexChunkFromBlock(targetBlock.x, targetBlock.z);
         BlockComponentChunk blockComponentChunk = chunkStore.getChunkComponent(chunkIndex, BlockComponentChunk.getComponentType());
@@ -57,6 +58,12 @@ public class FluxUtil {
             Ref<ChunkStore> blockRef = blockComponentChunk.getEntityReference(blockIndex);
 
             if (blockRef != null && blockRef.isValid()) {
+                BlockModule.BlockStateInfo stateInfo = blockRef.getStore().getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
+
+                if (stateInfo == null || !stateInfo.getChunkRef().isValid()) {
+                    return null;
+                }
+
                 Store<ChunkStore> store = chunkStore.getStore();
                 Archetype<ChunkStore> archetype = store.getArchetype(blockRef);
                 for (int i = archetype.getMinIndex(); i < archetype.length(); ++i) {
@@ -66,7 +73,7 @@ public class FluxUtil {
                         Component<ChunkStore> component = store.getComponent(blockRef, compType);
 
                         if (component instanceof IFluxProvider provider) {
-                            IFluxHandler<F> handler = provider.getFluxHandler(fluxType, side);
+                            IFluxHandler<F> handler = provider.getFluxHandler(fluxType, side, access);
                             if (handler != null) {
                                 return handler;
                             }

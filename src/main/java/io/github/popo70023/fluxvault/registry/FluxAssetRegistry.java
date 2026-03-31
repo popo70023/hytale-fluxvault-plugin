@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.registry;
 
 import com.hypixel.hytale.assetstore.map.IndexedLookupTableAssetMap;
@@ -6,6 +11,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.plugin.registry.AssetRegistry;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry;
 import io.github.popo70023.fluxvault.FluxVaultPlugin;
+import io.github.popo70023.fluxvault.energy.interaction.SingleEnergyContainerInformationInteraction;
 import io.github.popo70023.fluxvault.liquid.Liquid;
 import io.github.popo70023.fluxvault.liquid.interaction.DrainLiquidContainerInteraction;
 import io.github.popo70023.fluxvault.liquid.interaction.FillLiquidContainerInteraction;
@@ -33,6 +39,7 @@ public class FluxAssetRegistry {
     }
 
     private static void registerInteraction(CodecMapRegistry.Assets<Interaction, ?> codecRegistry) {
+        codecRegistry.register(SingleEnergyContainerInformationInteraction.ID, SingleEnergyContainerInformationInteraction.class, SingleEnergyContainerInformationInteraction.CODEC);
         codecRegistry.register(FillLiquidContainerInteraction.ID, FillLiquidContainerInteraction.class, FillLiquidContainerInteraction.CODEC);
         codecRegistry.register(DrainLiquidContainerInteraction.ID, DrainLiquidContainerInteraction.class, DrainLiquidContainerInteraction.CODEC);
         codecRegistry.register(OpenSingleLiquidContainerInteraction.ID, OpenSingleLiquidContainerInteraction.class, OpenSingleLiquidContainerInteraction.CODEC);

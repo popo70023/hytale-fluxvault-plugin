@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.api;
 
 import javax.annotation.Nonnull;
@@ -12,6 +17,20 @@ import javax.annotation.Nonnull;
  * @param <F> The carrier type (e.g., LiquidFlux).
  */
 public interface IFluxHandler<F extends IFlux<?>> {
+
+    /**
+     * Determines whether this handler is capable of processing the specified {@link FluxType}.
+     * <p>
+     * This method delegates the capability routing to the handler itself, enabling high compatibility
+     * and dynamic multiplexing. Implementations should evaluate whether the incoming type's carrier class
+     * (via {@code fluxType.getResourceClass()}) is assignable to the specific payload class ({@code F})
+     * this handler manages, rather than strictly equating the FluxType instances.
+     * </p>
+     *
+     * @param fluxType The type definition querying for physical and logical compatibility.
+     * @return {@code true} if this handler can safely process the carrier payload associated with the given type; {@code false} otherwise.
+     */
+    boolean matchesFluxType(FluxType<?, ?> fluxType);
 
     /**
      * Inserts resources into this handler.

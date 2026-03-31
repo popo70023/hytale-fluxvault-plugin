@@ -1,7 +1,11 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.api;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -64,18 +68,10 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         protected final List<D> stacks;
 
         /**
-         * Constructs from an array of stacks.
-         */
-        @SafeVarargs
-        public Bundle(D... stacks) {
-            this.stacks = new ArrayList<>(List.of(stacks));
-        }
-
-        /**
          * Constructs from a list of stacks.
          */
         public Bundle(List<D> stacks) {
-            this.stacks = new ArrayList<>(stacks);
+            this.stacks = stacks;
         }
 
         @Override
@@ -187,7 +183,7 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         @Override
         public D setStack(int index, D stack) {
             if (index == 0) {
-                this.content = stack;
+                content = stack;
             } else {
                 throw new IndexOutOfBoundsException("Packet only supports index 0!");
             }
@@ -207,10 +203,24 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         public D removeStack(int index) {
             if (index == 0) {
                 D old = content;
-                this.content = null;
+                content = null;
                 return old;
             }
             return null;
         }
+
+        @Override
+        public boolean isIndexEmpty(int index) {
+            return index != 0 || isContentEmpty();
+        }
+
+        public abstract boolean isContentEmpty();
+
+        @Override
+        public boolean matchesWithIndex(int index, D reference) {
+            return index == 0 && matchesWithContent(reference);
+        }
+
+        public abstract boolean matchesWithContent(D reference);
     }
 }

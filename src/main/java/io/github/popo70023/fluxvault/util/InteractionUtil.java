@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.util;
 
 import com.hypixel.hytale.component.CommandBuffer;
@@ -16,6 +21,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.api.FluxType;
 import io.github.popo70023.fluxvault.api.IFlux;
 import io.github.popo70023.fluxvault.api.IFluxHandler;
+import io.github.popo70023.fluxvault.api.IFluxProvider;
 
 import javax.annotation.Nonnull;
 
@@ -24,8 +30,8 @@ public final class InteractionUtil {
     private InteractionUtil() {
     }
 
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType) {
-        return FluxUtil.getFluxHandler(world, targetBlock, fluxType, BlockFace.None);
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, IFluxProvider.FluxAccess access) {
+        return FluxUtil.getFluxHandler(world, targetBlock, fluxType, BlockFace.None, access);
     }
 
     public static void exchangeHeldItem(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, int consumeAmount, ItemStack resultItem) {

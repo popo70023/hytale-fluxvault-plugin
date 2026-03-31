@@ -1,3 +1,8 @@
+/*
+ * FluxVault - A universal transport protocol for Hytale.
+ * Copyright (c) 2026 Ben (popo70023)
+ * Licensed under the MIT License.
+ */
 package io.github.popo70023.fluxvault.liquid.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -16,6 +21,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.api.FluxType;
 import io.github.popo70023.fluxvault.api.IFluxHandler;
+import io.github.popo70023.fluxvault.api.IFluxProvider;
 import io.github.popo70023.fluxvault.liquid.LiquidCapsuleType;
 import io.github.popo70023.fluxvault.liquid.LiquidFlux;
 import io.github.popo70023.fluxvault.util.InteractionUtil;
@@ -32,7 +38,7 @@ public class DrainLiquidContainerInteraction extends SimpleBlockInteraction {
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NullableDecl ItemStack itemInHand, @NonNullDecl Vector3i pos, @NonNullDecl CooldownHandler cooldownHandler) {
         Ref<EntityStore> playerRef = context.getEntity();
         Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
-        IFluxHandler<LiquidFlux> handler = InteractionUtil.getFluxHandler(world, pos, FluxType.LIQUID);
+        IFluxHandler<LiquidFlux> handler = InteractionUtil.getFluxHandler(world, pos, FluxType.LIQUID, IFluxProvider.FluxAccess.DRAIN);
         InteractionSyncData state = context.getState();
 
         if (player == null || itemInHand == null || itemInHand.isEmpty() || handler == null) {
