@@ -171,6 +171,39 @@ public interface IFlux<D> {
     }
 
     /**
+     * Checks if this carrier enforces a strict "All-or-Nothing" atomic transaction contract.
+     * <p>
+     * If {@code true}, the receiving {@link IFluxHandler} MUST completely fulfill the requested
+     * transfer amount or reject the transaction entirely. Partial (best-effort) transfers are
+     * strictly forbidden under an exact contract.
+     * </p>
+     *
+     * @return True if this carrier requires an exact transaction.
+     */
+    boolean isExact();
+
+    /**
+     * Defines whether this carrier must be processed atomically.
+     *
+     * @param exact True to enforce an "All-or-Nothing" transfer contract, false to allow partial transfers.
+     */
+    void setExact(boolean exact);
+
+    /**
+     * A fluent alternative to {@link #setExact(boolean)}.
+     * <p>
+     * Applies the strict atomicity contract and returns the current instance to facilitate method chaining.
+     * </p>
+     *
+     * @param exact True to enforce an "All-or-Nothing" transfer contract, false to allow partial transfers.
+     * @return This carrier instance, for operation chaining.
+     */
+    default IFlux<D> withExact(boolean exact) {
+        setExact(exact);
+        return this;
+    }
+
+    /**
      * Tests whether the provided target data satisfies this carrier's internal validator.
      *
      * @param targetData The external data to test.

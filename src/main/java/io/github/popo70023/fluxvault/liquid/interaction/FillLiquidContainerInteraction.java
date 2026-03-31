@@ -64,7 +64,7 @@ public class FillLiquidContainerInteraction extends SimpleBlockInteraction {
             return false;
         }
 
-        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, handler, IFluxHandler.FluxAction.EXECUTE_EXACT);
+        ItemStack resultItem = LiquidCapsuleType.interactWithContainer(itemInHand, handler, IFluxHandler.FluxAction.EXECUTE);
         if (resultItem != null) {
             InteractionUtil.exchangeHeldItem(commandBuffer, context, 1, resultItem);
             return true;

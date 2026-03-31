@@ -21,9 +21,10 @@ import java.util.function.Predicate;
  * @param <D> The data type.
  */
 public abstract class AbstractFlux<D> implements IFlux<D> {
-    @Nonnull
-    protected Predicate<D> validator = _ -> true;
-    private long transferLimit = Long.MAX_VALUE;
+    private static final FluxAttributes<?> DEFAULT_ATTRIBUTES = new FluxAttributes<>();
+
+    @SuppressWarnings("unchecked")
+    protected FluxAttributes<D> attributes = (FluxAttributes<D>) DEFAULT_ATTRIBUTES;
 
     @Override
     public int findIndexOfFirstMatchesStack(Predicate<D> validator) {
@@ -37,23 +38,65 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
 
     @Override
     public long getTransferLimit() {
-        return this.transferLimit;
+        return attributes.transferLimit;
     }
 
     @Override
     public void setTransferLimit(long limit) {
-        this.transferLimit = Math.max(0, limit);
+        ensureMutableAttributes();
+        attributes.transferLimit = Math.max(0, limit);
     }
 
     @Override
     @Nonnull
     public Predicate<D> getValidator() {
-        return validator;
+        return attributes.validator;
     }
 
     @Override
     public void setValidator(Predicate<D> validator) {
-        this.validator = (validator != null) ? validator : _ -> true;
+        ensureMutableAttributes();
+        attributes.validator = (validator != null) ? validator : _ -> true;
+    }
+
+    @Override
+    public boolean isExact() {
+        return attributes.isExact;
+    }
+
+    @Override
+    public void setExact(boolean exact) {
+        ensureMutableAttributes();
+        attributes.isExact = exact;
+    }
+
+    private void ensureMutableAttributes() {
+        if (this.attributes == DEFAULT_ATTRIBUTES) {
+            this.attributes = new FluxAttributes<>();
+        }
+    }
+
+    // =================================================================================
+    // Internal Attribute Container
+    // =================================================================================
+
+    protected static class FluxAttributes<D> {
+        @Nonnull
+        public Predicate<D> validator = _ -> true;
+        public long transferLimit = Long.MAX_VALUE;
+        public boolean isExact = false;
+
+        public FluxAttributes() {}
+
+        public FluxAttributes<D> copy() {
+            if(this == DEFAULT_ATTRIBUTES) return this;
+
+            FluxAttributes<D> clone = new FluxAttributes<>();
+            clone.validator = this.validator;
+            clone.transferLimit = this.transferLimit;
+            clone.isExact = this.isExact;
+            return clone;
+        }
     }
 
     // =================================================================================

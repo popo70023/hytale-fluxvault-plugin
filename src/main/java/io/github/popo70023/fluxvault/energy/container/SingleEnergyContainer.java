@@ -93,7 +93,7 @@ public class SingleEnergyContainer extends EnergyContainer.FixedCapacity impleme
             if (spaceAvailable <= 0) return resultFlux;
 
             long canFill = Math.min(Math.min(spaceAvailable, resourceQuantity), resource.getTransferLimit());
-            if (action.exact() && canFill < resourceQuantity) return resultFlux;
+            if (resource.isExact() && canFill < resourceQuantity) return resultFlux;
 
             if (action.execute()) {
                 this.content.addQuantity(canFill);
@@ -125,7 +125,7 @@ public class SingleEnergyContainer extends EnergyContainer.FixedCapacity impleme
 
             if (toDrain <= 0) return resultFlux;
 
-            if (action.exact() && toDrain < requestQuantity) {
+            if (requestResources.isExact() && toDrain < requestQuantity) {
                 return resultFlux;
             }
 

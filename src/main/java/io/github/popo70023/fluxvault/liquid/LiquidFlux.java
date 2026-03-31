@@ -7,6 +7,7 @@ package io.github.popo70023.fluxvault.liquid;
 
 import io.github.popo70023.fluxvault.api.AbstractFlux;
 import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.api.IFlux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +81,21 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
         return getStack(index).isEquivalentType(reference);
     }
 
+    @Override
     public LiquidFlux withLimit(long limit) {
         setTransferLimit(limit);
         return this;
     }
 
+    @Override
     public LiquidFlux withValidator(Predicate<LiquidStack> validator) {
         setValidator(validator);
+        return this;
+    }
+
+    @Override
+    public LiquidFlux withExact(boolean exact) {
+        setExact(exact);
         return this;
     }
 
@@ -96,7 +105,9 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
         for (LiquidStack s : this.stacks) {
             newStacks.add(s.copy());
         }
-        return new LiquidFlux(newStacks);
+        LiquidFlux copy = new LiquidFlux(newStacks);
+        copy.attributes = this.attributes.copy();
+        return copy;
     }
 
     @Override

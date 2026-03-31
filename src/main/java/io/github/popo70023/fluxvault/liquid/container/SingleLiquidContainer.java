@@ -125,7 +125,7 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
 
             if (totalCalculatedFill <= 0) return resultFlux;
 
-            if (action.exact()) {
+            if (resource.isExact()) {
                 long targetExact = Math.min(resource.getAllQuantity(), resource.getTransferLimit());
                 if (totalCalculatedFill < targetExact) {
                     return resultFlux;
@@ -207,7 +207,7 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
 
             if (totalCalculatedDrain <= 0) return resultFlux;
 
-            if (action.exact()) {
+            if (requestResources.isExact()) {
                 long targetExact = Math.min(requestResources.getAllQuantity(), requestResources.getTransferLimit());
                 if (totalCalculatedDrain < targetExact) {
                     return resultFlux;

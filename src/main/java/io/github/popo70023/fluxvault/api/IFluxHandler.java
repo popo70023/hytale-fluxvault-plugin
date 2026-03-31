@@ -35,15 +35,24 @@ public interface IFluxHandler<F extends IFlux<?>> {
     /**
      * Inserts resources into this handler.
      * <p>
+     * <b>CARRIER CONTRACT:</b>
+     * The handler MUST respect all attributes defined by the provided {@code resource}:
+     * <ul>
+     *   <li>{@link IFlux#isExact()}: If true, the operation must be All-or-Nothing.</li>
+     *   <li>{@link IFlux#getTransferLimit()}: The inserted amount must not exceed this limit.</li>
+     *   <li>{@link IFlux#getValidator()}: Only payloads satisfying this predicate are allowed.</li>
+     * </ul>
+     * </p>
+     * <p>
      * <b>MUTABILITY CONTRACT:</b>
-     * If the action is {@link FluxAction#EXECUTE} or {@link FluxAction#EXECUTE_EXACT}, the provided {@code resource} MAY be mutated
+     * If the action is {@link FluxAction#EXECUTE}, the provided {@code resource} MAY be mutated
      * (e.g., quantities reduced) to reflect the remaining unaccepted payload for subsequent routing.
-     * If the action is {@link FluxAction#SIMULATE} or {@link FluxAction#SIMULATE_EXACT}, the {@code resource} MUST remain completely unmodified.
+     * If the action is {@link FluxAction#SIMULATE}, the {@code resource} MUST remain completely unmodified.
      * </p>
      *
      * @param resource The resources to insert.
-     * @param action   The operation mode (SIMULATE, EXECUTE, or their EXACT variants).
-     * @return The resources <b>actually inserted</b>. Returns empty if nothing was filled.
+     * @param action   The operation mode (SIMULATE or EXECUTE).
+     * @return The resources <b>actually inserted</b>. Returns empty if nothing was filled or if any carrier contract failed.
      */
     @Nonnull
     F fill(@Nonnull F resource, @Nonnull FluxAction action);
@@ -51,98 +60,57 @@ public interface IFluxHandler<F extends IFlux<?>> {
     /**
      * Extracts resources from this handler based on a request.
      * <p>
+     * <b>CARRIER CONTRACT:</b>
+     * The handler MUST respect all attributes defined by the {@code requestResources}:
+     * <ul>
+     *   <li>{@link IFlux#isExact()}: If true, the operation must be All-or-Nothing.</li>
+     *   <li>{@link IFlux#getTransferLimit()}: The extracted amount must not exceed this limit.</li>
+     *   <li>{@link IFlux#getValidator()}: Only payloads satisfying this predicate can be extracted.</li>
+     * </ul>
+     * </p>
+     * <p>
      * <b>MUTABILITY CONTRACT:</b>
-     * If the action is {@link FluxAction#EXECUTE} or {@link FluxAction#EXECUTE_EXACT}, the provided {@code requestResources} MAY be mutated
-     * (e.g., target definitions altered, quantities reduced) to reflect the remaining unfulfilled request.
-     * If the action is {@link FluxAction#SIMULATE} or {@link FluxAction#SIMULATE_EXACT}, the {@code requestResources} MUST remain completely unmodified.
+     * If the action is {@link FluxAction#EXECUTE}, the provided {@code requestResources} MAY be mutated
+     * (e.g., quantities reduced) to reflect the remaining unfulfilled request.
+     * If the action is {@link FluxAction#SIMULATE}, the {@code requestResources} MUST remain completely unmodified.
      * </p>
      *
-     * @param requestResources A carrier defining the desired resources (filter) and maximum amounts to extract.
-     * @param action           The operation mode (SIMULATE, EXECUTE, or their EXACT variants).
-     * @return The resources <b>actually extracted</b>. Returns empty if nothing was drained.
+     * @param requestResources A carrier defining the desired resources and limits to extract.
+     * @param action           The operation mode (SIMULATE or EXECUTE).
+     * @return The resources <b>actually extracted</b>. Returns empty if nothing was drained or if any carrier contract failed.
      */
     @Nonnull
     F drain(@Nonnull F requestResources, @Nonnull FluxAction action);
 
     /**
      * Operation mode for Flux interactions.
-     * Defines both the mutability intent (Execute vs Simulate) and the strictness of the transaction (Partial vs Exact).
+     * Defines the mutability intent (Execute vs Simulate).
      */
     enum FluxAction {
         /**
-         * <b>Standard/Partial Execution:</b>
-         * Modifies the state of both the handler and the provided resource payload.
-         * Accepts or extracts as much of the requested amount as possible (Best-effort).
+         * <b>Execution Mode:</b>
+         * Permitted to modify the state of both the handler and the provided resource payload.
          */
         EXECUTE,
 
         /**
-         * <b>Standard/Partial Simulation:</b>
-         * Calculates the result without modifying the handler's state or the provided resource payload.
-         * Evaluates how much of the requested amount *would* be processed.
+         * <b>Simulation Mode:</b>
+         * Calculates the result without modifying any logical or physical states.
          */
-        SIMULATE,
+        SIMULATE;
 
         /**
-         * <b>Strict/Exact Execution:</b>
-         * Modifies states ONLY IF the exact requested amount can be accommodated.
-         * Enforces an "All-or-Nothing" contract: if the container cannot fulfill the exact quantity requested,
-         * no state changes occur and an empty result is returned.
-         */
-        EXECUTE_EXACT,
-
-        /**
-         * <b>Strict/Exact Simulation:</b>
-         * Calculates the result for an exact amount transfer without modifying states.
-         * Returns empty if the exact amount cannot be accommodated.
-         */
-        SIMULATE_EXACT;
-
-        /**
-         * Checks if this action permits state mutation.
-         *
-         * @return True if this is an execution action (EXECUTE or EXECUTE_EXACT).
+         * @return True if this is an execution action.
          */
         public boolean execute() {
-            return this == EXECUTE || this == EXECUTE_EXACT;
+            return this == EXECUTE;
         }
 
         /**
-         * Checks if this action strictly forbids state mutation.
-         *
-         * @return True if this is a simulation action (SIMULATE or SIMULATE_EXACT).
+         * @return True if this is a simulation action.
          */
         public boolean simulate() {
-            return this == SIMULATE || this == SIMULATE_EXACT;
-        }
-
-        /**
-         * Checks if this action enforces the rigid All-or-Nothing volume contract.
-         *
-         * @return True if this action requires the exact requested amount to be processed.
-         */
-        public boolean exact() {
-            return this == EXECUTE_EXACT || this == SIMULATE_EXACT;
-        }
-
-        /**
-         * Coerces the current operation intent into its strict (Exact) counterpart.
-         * Preserves the existing mutability intent (Execute/Simulate).
-         *
-         * @return EXECUTE_EXACT if currently executing, SIMULATE_EXACT if currently simulating.
-         */
-        public FluxAction asExact() {
-            return this.execute() ? EXECUTE_EXACT : SIMULATE_EXACT;
-        }
-
-        /**
-         * Coerces the current operation intent into its lenient (Partial/Best-effort) counterpart.
-         * Preserves the existing mutability intent (Execute/Simulate).
-         *
-         * @return EXECUTE if currently executing, SIMULATE if currently simulating.
-         */
-        public FluxAction asPartial() {
-            return this.execute() ? EXECUTE : SIMULATE;
+            return this == SIMULATE;
         }
     }
 }

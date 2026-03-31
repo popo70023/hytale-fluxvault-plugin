@@ -99,8 +99,8 @@ public class LiquidCapsuleType {
         if (capsuleType == null) return null;
         boolean isEmptyCapsule = capsuleType.isEmptyCapsule(capsule);
 
-        LiquidFlux contentFlux = new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule);
-        LiquidFlux interactedFlux = isEmptyCapsule ? handler.drain(contentFlux, action.asExact()) : handler.fill(contentFlux, action.asExact());
+        LiquidFlux contentFlux = new LiquidFlux(capsuleType.getLiquidStackInCapsule(capsule)).withValidator(capsuleType::isLiquidHasCapsule).withExact(true);
+        LiquidFlux interactedFlux = isEmptyCapsule ? handler.drain(contentFlux, action) : handler.fill(contentFlux, action);
 
         if (!interactedFlux.isEmpty()) {
             if (isEmptyCapsule) {

@@ -32,7 +32,7 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
         ItemFlux resultFlux = new ItemFlux();
         if (resource.isEmpty()) return resultFlux;
 
-        if (action.exact()) {
+        if (resource.isExact()) {
             ItemContainer simContainer = this.container.clone();
             for (int i = 0; i < resource.getStackCount(); i++) {
                 if (resource.isIndexEmpty(i)) continue;
@@ -102,7 +102,7 @@ public class ItemContainerAdapter implements IFluxHandler<ItemFlux> {
         ItemFlux resultFlux = new ItemFlux();
         if (this.container.isEmpty() || requestResources.isEmpty()) return resultFlux;
 
-        if (action.exact()) {
+        if (requestResources.isExact()) {
             ItemContainer simContainer = this.container.clone();
             for (int r = 0; r < requestResources.getStackCount(); r++) {
                 if (requestResources.isIndexEmpty(r)) continue;

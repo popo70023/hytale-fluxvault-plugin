@@ -45,7 +45,7 @@ public class CreativeEnergyComponent implements Component<ChunkStore>, IFluxProv
             long resourceQuantity = resourceStack.getQuantity();
 
             long canFill = Math.min(resourceQuantity, resource.getTransferLimit());
-            if (action.exact() && canFill < resourceQuantity) return resultFlux;
+            if (resource.isExact() && canFill < resourceQuantity) return resultFlux;
 
             if (action.execute()) {
                 if (resourceStack.addQuantity(-canFill) == 0) resource.removeStack();
@@ -68,7 +68,7 @@ public class CreativeEnergyComponent implements Component<ChunkStore>, IFluxProv
 
             if (toDrain <= 0) return resultFlux;
 
-            if (action.exact() && toDrain < requestQuantity) {
+            if (requestResources.isExact() && toDrain < requestQuantity) {
                 return resultFlux;
             }
 

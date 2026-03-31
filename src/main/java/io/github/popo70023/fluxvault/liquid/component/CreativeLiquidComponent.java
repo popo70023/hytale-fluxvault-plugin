@@ -61,7 +61,7 @@ public class CreativeLiquidComponent implements Component<ChunkStore>, IFluxProv
 
             if (totalCalculatedFill <= 0) return resultFlux;
 
-            if (action.exact()) {
+            if (resource.isExact()) {
                 long targetExact = Math.min(resource.getAllQuantity(), resource.getTransferLimit());
                 if (totalCalculatedFill < targetExact) {
                     return resultFlux;
@@ -120,7 +120,7 @@ public class CreativeLiquidComponent implements Component<ChunkStore>, IFluxProv
 
             if (totalCalculatedDrain <= 0) return resultFlux;
 
-            if (action.exact()) {
+            if (requestResources.isExact()) {
                 long targetExact = Math.min(requestResources.getAllQuantity(), requestResources.getTransferLimit());
                 if (totalCalculatedDrain < targetExact) {
                     return resultFlux;

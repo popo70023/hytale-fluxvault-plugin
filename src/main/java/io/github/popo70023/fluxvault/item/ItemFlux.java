@@ -8,6 +8,7 @@ package io.github.popo70023.fluxvault.item;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import io.github.popo70023.fluxvault.api.AbstractFlux;
 import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.api.IFlux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,18 +74,28 @@ public class ItemFlux extends AbstractFlux.Bundle<ItemStack> {
         return ItemStack.isEquivalentType(getStack(index), reference);
     }
 
+    @Override
     public ItemFlux withLimit(long limit) {
         setTransferLimit(limit);
         return this;
     }
 
+    @Override
     public ItemFlux withValidator(Predicate<ItemStack> validator) {
         setValidator(validator);
         return this;
     }
 
     @Override
+    public ItemFlux withExact(boolean exact) {
+        setExact(exact);
+        return this;
+    }
+
+    @Override
     public ItemFlux copy() {
-        return new ItemFlux(new ArrayList<>(this.stacks));
+        ItemFlux copy = new ItemFlux(stacks);
+        copy.attributes = this.attributes.copy();
+        return copy;
     }
 }
