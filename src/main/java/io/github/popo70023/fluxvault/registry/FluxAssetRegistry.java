@@ -11,12 +11,14 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.plugin.registry.AssetRegistry;
 import com.hypixel.hytale.server.core.plugin.registry.CodecMapRegistry;
 import io.github.popo70023.fluxvault.FluxVaultPlugin;
-import io.github.popo70023.fluxvault.energy.interaction.SingleEnergyContainerInformationInteraction;
-import io.github.popo70023.fluxvault.liquid.Liquid;
-import io.github.popo70023.fluxvault.liquid.interaction.DrainLiquidContainerInteraction;
-import io.github.popo70023.fluxvault.liquid.interaction.FillLiquidContainerInteraction;
-import io.github.popo70023.fluxvault.liquid.interaction.OpenSingleLiquidContainerInteraction;
-import io.github.popo70023.fluxvault.liquid.interaction.SingleLiquidContainerInformationInteraction;
+import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.interaction.InspectContainerInteraction;
+import io.github.popo70023.fluxvault.payload.liquid.Liquid;
+import io.github.popo70023.fluxvault.payload.liquid.LiquidCapsuleType;
+import io.github.popo70023.fluxvault.payload.liquid.interaction.DrainLiquidContainerBlockInteraction;
+import io.github.popo70023.fluxvault.payload.liquid.interaction.FillLiquidContainerBlockInteraction;
+import io.github.popo70023.fluxvault.payload.resource.FluxResource;
+import io.github.popo70023.fluxvault.payload.resource.interaction.FillResourceContainerBlockInteraction;
 
 public class FluxAssetRegistry {
     public static HytaleAssetStore<String, Liquid, IndexedLookupTableAssetMap<String, Liquid>> LIQUID_ASSET_STORE = HytaleAssetStore.builder(Liquid.class, new IndexedLookupTableAssetMap<>(Liquid[]::new))
@@ -33,26 +35,41 @@ public class FluxAssetRegistry {
             .setReplaceOnRemove(_ -> new LiquidCapsuleTypes())
             .build();
 
+    public static HytaleAssetStore<String, FluxResource, IndexedLookupTableAssetMap<String, FluxResource>> FLUX_RESOURCE_ASSET_STORE = HytaleAssetStore.builder(FluxResource.class, new IndexedLookupTableAssetMap<>(FluxResource[]::new))
+            .setPath("Item/FluxResource")
+            .setCodec(FluxResource.CODEC)
+            .setKeyFunction(FluxResource::getId)
+            .setReplaceOnRemove(_ -> new FluxResource())
+            .build();
+
     private static void registerAssets(AssetRegistry assetRegistry) {
         assetRegistry.register(LIQUID_ASSET_STORE);
         assetRegistry.register(CAPSULE_TYPE_ASSET_STORE);
+        assetRegistry.register(FLUX_RESOURCE_ASSET_STORE);
     }
 
     private static void registerInteraction(CodecMapRegistry.Assets<Interaction, ?> codecRegistry) {
-        codecRegistry.register(SingleEnergyContainerInformationInteraction.ID, SingleEnergyContainerInformationInteraction.class, SingleEnergyContainerInformationInteraction.CODEC);
-        codecRegistry.register(FillLiquidContainerInteraction.ID, FillLiquidContainerInteraction.class, FillLiquidContainerInteraction.CODEC);
-        codecRegistry.register(DrainLiquidContainerInteraction.ID, DrainLiquidContainerInteraction.class, DrainLiquidContainerInteraction.CODEC);
-        codecRegistry.register(OpenSingleLiquidContainerInteraction.ID, OpenSingleLiquidContainerInteraction.class, OpenSingleLiquidContainerInteraction.CODEC);
-        codecRegistry.register(SingleLiquidContainerInformationInteraction.ID, SingleLiquidContainerInformationInteraction.class, SingleLiquidContainerInformationInteraction.CODEC);
+        codecRegistry.register(InspectContainerInteraction.Id, InspectContainerInteraction.class, InspectContainerInteraction.CODEC);
+        codecRegistry.register(FillLiquidContainerBlockInteraction.Id, FillLiquidContainerBlockInteraction.class, FillLiquidContainerBlockInteraction.CODEC);
+        codecRegistry.register(DrainLiquidContainerBlockInteraction.Id, DrainLiquidContainerBlockInteraction.class, DrainLiquidContainerBlockInteraction.CODEC);
+        //codecRegistry.register(OpenSingleLiquidContainerBlockInteraction.Id, OpenSingleLiquidContainerBlockInteraction.class, OpenSingleLiquidContainerBlockInteraction.CODEC);
+        codecRegistry.register(FillResourceContainerBlockInteraction.Id, FillResourceContainerBlockInteraction.class, FillResourceContainerBlockInteraction.CODEC);
     }
 
     public static void RegistryAtSetup(FluxVaultPlugin plugin) {
         ComponentTypes.registerChunkStore(plugin.getChunkStoreRegistry());
+        ComponentTypes.registerEntityStore(plugin.getEntityStoreRegistry());
         FluxAssetRegistry.registerAssets(plugin.getAssetRegistry());
         FluxAssetRegistry.registerInteraction(plugin.getCodecRegistry(Interaction.CODEC));
     }
 
     public static void RegistryAtStart(FluxVaultPlugin plugin) {
         LiquidCapsuleTypes.registerLiquidCapsuleType();
+        FluxType.registerFluxTypes();
+    }
+
+    public static void ClearCacheAtShutdown(FluxVaultPlugin plugin) {
+        FluxType.clearCache();
+        LiquidCapsuleType.clearCache();
     }
 }

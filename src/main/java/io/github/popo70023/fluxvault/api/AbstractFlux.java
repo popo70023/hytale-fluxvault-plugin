@@ -86,10 +86,11 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         public long transferLimit = Long.MAX_VALUE;
         public boolean isExact = false;
 
-        public FluxAttributes() {}
+        public FluxAttributes() {
+        }
 
         public FluxAttributes<D> copy() {
-            if(this == DEFAULT_ATTRIBUTES) return this;
+            if (this == DEFAULT_ATTRIBUTES) return this;
 
             FluxAttributes<D> clone = new FluxAttributes<>();
             clone.validator = this.validator;

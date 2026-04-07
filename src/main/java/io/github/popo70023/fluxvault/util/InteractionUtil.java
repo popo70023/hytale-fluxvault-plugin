@@ -16,12 +16,13 @@ import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransaction;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.api.FluxType;
 import io.github.popo70023.fluxvault.api.IFlux;
 import io.github.popo70023.fluxvault.api.IFluxHandler;
-import io.github.popo70023.fluxvault.api.IFluxProvider;
+import io.github.popo70023.fluxvault.api.IFluxHandlerProvider;
 
 import javax.annotation.Nonnull;
 
@@ -30,8 +31,14 @@ public final class InteractionUtil {
     private InteractionUtil() {
     }
 
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, IFluxProvider.FluxAccess access) {
-        return FluxUtil.getFluxHandler(world, targetBlock, fluxType, BlockFace.None, access);
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getBlockFluxHandler(World world, Vector3i targetBlock, @Nonnull FluxType<F, D> fluxType, String tag, IFluxHandlerProvider.FluxAccess access) {
+        return FluxUtil.getBlockFluxHandler(world, targetBlock, fluxType, BlockFace.None, tag, access);
+    }
+
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getEntityFluxHandler(@Nonnull InteractionContext context, @Nonnull FluxType<F, D> fluxType, String slotName, IFluxHandlerProvider.FluxAccess access) {
+        Ref<EntityStore> targetEntity = context.getTargetEntity();
+        String hitDetail = context.getMetaStore().getIfPresentMetaObject(Interaction.HIT_DETAIL);
+        return FluxUtil.getEntityFluxHandler(targetEntity, fluxType, hitDetail != null ? hitDetail : "", slotName, access);
     }
 
     public static void exchangeHeldItem(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, int consumeAmount, ItemStack resultItem) {

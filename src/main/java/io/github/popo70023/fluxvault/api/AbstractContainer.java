@@ -9,6 +9,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public abstract class AbstractContainer<D> implements IFluxContainer<D> {
+    public static final String ACTIVE_CONTAINER_KEY = "ActiveContainer";
+    public static final String ACTIVE_CONTAINERS_KEY = "ActiveContainers";
+    public static final String ACTIVE_CONTAINER_DOCUMENTATION = "Optional initial payload. Leave blank to generate an empty container at runtime.";
     public static final String CONTENT_KEY = "Content";
     public static final String CONTENTS_KEY = "Contents";
     public static final String CAPACITY_KEY = "Capacity";

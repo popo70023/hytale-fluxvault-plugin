@@ -49,17 +49,15 @@
       "Use": {
         "Interactions": [
           {
-            "Type": "FillLiquidContainer",
-            "SimulateOnly": false,
+            "Type": "fluxvault:Fill_Liquid_Container_Block",
             "Failed": {
-              "Type": "DrainLiquidContainer",
-              "SimulateOnly": false,
+              "Type": "fluxvault:Drain_Liquid_Container_Block",
               "CancelOnItemChange": true
             },
             "CancelOnItemChange": true
           },
           {
-            "Type": "SingleLiquidContainerInformation",
+            "Type": "fluxvault:Inspect_Container",
             "CancelOnItemChange": true
           }
         ]
@@ -67,9 +65,8 @@
     },
     "BlockEntity": {
       "Components": {
-        "SingleLiquidContainerComponent": {
-          "Capacity": 10000,
-          "AcceptedHazards": []
+        "fluxvault:SimpleLiquidContainerBlock": {
+          "Capacity": 10000
         }
       }
     }

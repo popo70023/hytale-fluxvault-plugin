@@ -13,18 +13,14 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import io.github.popo70023.fluxvault.liquid.LiquidCapsuleType;
+import io.github.popo70023.fluxvault.payload.liquid.LiquidCapsuleType;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class LiquidCapsuleTypes implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, LiquidCapsuleTypes>> {
-    public static final AssetBuilderCodec<String, LiquidCapsuleTypes> CODEC = AssetBuilderCodec.builder(LiquidCapsuleTypes.class, LiquidCapsuleTypes::new, Codec.STRING,
-                    LiquidCapsuleTypes::setId, LiquidCapsuleTypes::getId, LiquidCapsuleTypes::setAssetData, LiquidCapsuleTypes::getAssetData)
-            .append(new KeyedCodec<>("Data", new ArrayCodec<>(Data.CODEC, Data[]::new)), LiquidCapsuleTypes::setData, LiquidCapsuleTypes::getData)
-            .documentation("An array of capsule data definitions, mapping specific Hytale items to their liquid capacities and contents.").add()
-            .build();
+    public static final AssetBuilderCodec<String, LiquidCapsuleTypes> CODEC;
 
     private String registryId;
     private List<Data> data;
@@ -68,10 +64,17 @@ public class LiquidCapsuleTypes implements JsonAssetWithMap<String, IndexedLooku
         this.assetData = assetData;
     }
 
+    static {
+        CODEC = AssetBuilderCodec.builder(LiquidCapsuleTypes.class, LiquidCapsuleTypes::new, Codec.STRING, LiquidCapsuleTypes::setId, LiquidCapsuleTypes::getId, LiquidCapsuleTypes::setAssetData, LiquidCapsuleTypes::getAssetData)
+                .append(new KeyedCodec<>("Data", new ArrayCodec<>(Data.CODEC, Data[]::new)), LiquidCapsuleTypes::setData, LiquidCapsuleTypes::getData)
+                .documentation("An array of capsule data definitions, mapping specific Hytale items to their liquid capacities and contents.").add()
+                .build();
+    }
+
     public static class Data {
         public static final Codec<Data> CODEC = BuilderCodec.builder(Data.class, Data::new)
                 .append(new KeyedCodec<>("CapsuleId", Codec.STRING), (o, v) -> o.capsuleId = v, o -> o.capsuleId)
-                .documentation("The identifier for this capsule family (e.g., 'Wooden_Bucket'). Items sharing the same CapsuleId are treated as the same container type.").add()
+                .documentation("The identifier for this capsule family (e.g., 'Wooden_Bucket'). Items sharing the same CapsuleId are treated as the same activeContainer type.").add()
                 .append(new KeyedCodec<>("Capacity", Codec.INTEGER), (o, v) -> o.capacity = v, o -> o.capacity)
                 .documentation("The volume of liquid this item can hold (e.g., 1000 for a standard bucket).").add()
                 .append(new KeyedCodec<>("ItemId", Codec.STRING), (o, v) -> o.itemId = v, o -> o.itemId)

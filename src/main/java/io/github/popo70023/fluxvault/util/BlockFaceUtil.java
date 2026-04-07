@@ -9,6 +9,8 @@ import com.hypixel.hytale.protocol.BlockFace;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
+import java.util.Set;
+
 public final class BlockFaceUtil {
 
     private BlockFaceUtil() {
@@ -29,6 +31,37 @@ public final class BlockFaceUtil {
         };
     }
 
+    @NonNullDecl
+    public static BlockFace rotateYClockwise(@NullableDecl BlockFace face) {
+        if (face == null) return BlockFace.None;
+        return switch (face) {
+            case North -> BlockFace.East;
+            case East -> BlockFace.South;
+            case South -> BlockFace.West;
+            case West -> BlockFace.North;
+            default -> face;
+        };
+    }
+
+    @NonNullDecl
+    public static BlockFace rotateYCounterClockwise(@NullableDecl BlockFace face) {
+        if (face == null) return BlockFace.None;
+        return switch (face) {
+            case North -> BlockFace.West;
+            case West -> BlockFace.South;
+            case South -> BlockFace.East;
+            case East -> BlockFace.North;
+            default -> face;
+        };
+    }
+
+    @NonNullDecl
+    public static BlockFace rotateY180(@NullableDecl BlockFace face) {
+        if (face == null) return BlockFace.None;
+        if (isHorizontal(face)) return getOpposite(face);
+        return face;
+    }
+
     public static boolean isPhysical(@NullableDecl BlockFace face) {
         return face != null && face != BlockFace.None;
     }
@@ -40,5 +73,28 @@ public final class BlockFaceUtil {
 
     public static boolean isVertical(@NullableDecl BlockFace face) {
         return face == BlockFace.Up || face == BlockFace.Down;
+    }
+
+    enum BlockFaceGroup {
+        ALL(Set.of(BlockFace.None, BlockFace.Up, BlockFace.Down, BlockFace.North, BlockFace.South, BlockFace.East, BlockFace.West)),
+        ALL_FACE(Set.of(BlockFace.Up, BlockFace.Down, BlockFace.North, BlockFace.South, BlockFace.East, BlockFace.West)),
+        HORIZONTAL(Set.of(BlockFace.North, BlockFace.South, BlockFace.East, BlockFace.West)),
+        VERTICAL(Set.of(BlockFace.Up, BlockFace.Down)),
+        ONLY_NONE(Set.of(BlockFace.None));
+
+        private final Set<BlockFace> faces;
+
+        BlockFaceGroup(Set<BlockFace> faces) {
+            this.faces = faces; // Set.of() 已經保證了不可變性
+        }
+
+        @NonNullDecl
+        public Set<BlockFace> getFaces() {
+            return this.faces;
+        }
+
+        public boolean contains(@NullableDecl BlockFace face) {
+            return face != null && this.faces.contains(face);
+        }
     }
 }

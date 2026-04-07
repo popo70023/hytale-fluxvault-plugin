@@ -6,12 +6,16 @@
 package io.github.popo70023.fluxvault.api;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import io.github.popo70023.fluxvault.energy.EnergyFlux;
-import io.github.popo70023.fluxvault.energy.FluxEnergy;
-import io.github.popo70023.fluxvault.item.ItemFlux;
-import io.github.popo70023.fluxvault.liquid.LiquidFlux;
-import io.github.popo70023.fluxvault.liquid.LiquidStack;
+import io.github.popo70023.fluxvault.FluxVaultPlugin;
+import io.github.popo70023.fluxvault.payload.item.ItemFlux;
+import io.github.popo70023.fluxvault.payload.liquid.LiquidFlux;
+import io.github.popo70023.fluxvault.payload.liquid.LiquidStack;
+import io.github.popo70023.fluxvault.payload.resource.FluxResource;
+import io.github.popo70023.fluxvault.payload.resource.ResourceFlux;
+import io.github.popo70023.fluxvault.payload.resource.ResourceStack;
+import io.github.popo70023.fluxvault.registry.FluxAssetRegistry;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,38 +30,72 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FluxType<F extends IFlux<D>, D> {
     private static final Map<String, FluxType<?, ?>> REGISTRY = new ConcurrentHashMap<>();
+    private static final Map<String, FluxType<ResourceFlux, ResourceStack>> REGISTRY_RESOURCE = new ConcurrentHashMap<>();
 
-    public static final FluxType<ItemFlux, ItemStack> ITEM = register("ITEM", ItemFlux.class, ItemStack.class);
-    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = register("LIQUID", LiquidFlux.class, LiquidStack.class);
-    public static final FluxType<EnergyFlux, FluxEnergy> FLUX_ENERGY = register("FLUX_ENERGY", EnergyFlux.class, FluxEnergy.class);
+    public static final FluxType<ItemFlux, ItemStack> ITEM = new FluxType<>("Item", ItemFlux.class, ItemStack.class);
+    public static final FluxType<LiquidFlux, LiquidStack> LIQUID = new FluxType<>("FluxVault.Liquid", LiquidFlux.class, LiquidStack.class);
 
     private final String name;
-    private final Class<F> resourceClass;
+    private final Class<F> fluxClass;
     private final Class<D> dataClass;
 
-    private FluxType(String name, Class<F> resourceClass, Class<D> dataClass) {
+    public FluxType(String name, Class<F> fluxClass, Class<D> dataClass) {
         this.name = name;
-        this.resourceClass = resourceClass;
+        this.fluxClass = fluxClass;
         this.dataClass = dataClass;
     }
 
     /**
-     * Factory method that creates and securely registers a new FluxType into the global registry.
+     * Securely registers a {@code FluxType} instance into the global registry.
      * <p>
-     * This guarantees that all instantiated FluxTypes are properly tracked by the system.
+     * This guarantees that the provided FluxType is globally tracked and can be
+     * retrieved by its identifier during network RPCs or deserialization.
      * </p>
-     * * @param name          The unique identifier name.
      *
-     * @param resourceClass The Class object of the carrier.
-     * @param dataClass     The Class object of the data payload.
-     * @throws IllegalArgumentException if a type with the same name already exists.
+     * @param type The FluxType instance to register.
+     * @throws IllegalArgumentException if a different FluxType instance with the same name is already registered.
      */
-    public static <T extends IFlux<V>, V> FluxType<T, V> register(String name, Class<T> resourceClass, Class<V> dataClass) {
-        FluxType<T, V> newType = new FluxType<>(name, resourceClass, dataClass);
-        if (REGISTRY.putIfAbsent(name, newType) != null) {
-            throw new IllegalArgumentException("FluxType already registered with name: " + name);
+    public static void register(FluxType<?, ?> type) {
+        FluxVaultPlugin.getPluginLogger().atInfo().log("Registering " + type.getName() + " for FluxType");
+        FluxType<?, ?> existing = REGISTRY.get(type.getName());
+        if (existing != null && existing != type) {
+            throw new IllegalArgumentException("FluxType already registered with name: " + type.getName() + " by another instance!");
         }
-        return newType;
+
+        REGISTRY.put(type.getName(), type);
+    }
+
+    private static void registerResource(FluxType<ResourceFlux, ResourceStack> type) {
+        register(type);
+        REGISTRY_RESOURCE.put(type.getName(), type);
+    }
+
+    /**
+     * Internal lifecycle method to register all default and asset-driven FluxTypes.
+     * <p>
+     * Called during the server initialization phase after assets are loaded.
+     * </p>
+     */
+    public static void registerFluxTypes() {
+        register(ITEM);
+        register(LIQUID);
+        Collection<FluxResource> fluxResources = FluxAssetRegistry.FLUX_RESOURCE_ASSET_STORE.getAssetMap().getAssetMap().values();
+        for (FluxResource fluxResource : fluxResources) {
+            FluxType<ResourceFlux, ResourceStack> newType = new FluxType<>(fluxResource.getId(), ResourceFlux.class, ResourceStack.class);
+            registerResource(newType);
+        }
+    }
+
+    /**
+     * Clears the global registry cache.
+     * <p>
+     * Used primarily during server hot-reloads or shutdowns to prevent memory leaks
+     * and allow clean re-registration of capabilities.
+     * </p>
+     */
+    public static void clearCache() {
+        REGISTRY.clear();
+        REGISTRY_RESOURCE.clear();
     }
 
     /**
@@ -71,15 +109,15 @@ public final class FluxType<F extends IFlux<D>, D> {
         return REGISTRY.get(name);
     }
 
+    public static FluxType<ResourceFlux, ResourceStack> getResourceFluxTypeByName(String name) {
+        return REGISTRY_RESOURCE.get(name);
+    }
+
     /**
      * @return The unique identifier name.
      */
     public String getName() {
         return name;
-    }
-
-    public Class<F> getResourceClass() {
-        return resourceClass;
     }
 
     /**
@@ -98,6 +136,6 @@ public final class FluxType<F extends IFlux<D>, D> {
 
     @Override
     public String toString() {
-        return "FluxType{" + "name='" + name + '\'' + ", F=" + resourceClass.getSimpleName() + ", D=" + dataClass.getSimpleName() + '}';
+        return "FluxType{" + "name='" + name + '\'' + ", F=" + fluxClass.getSimpleName() + ", D=" + dataClass.getSimpleName() + '}';
     }
 }

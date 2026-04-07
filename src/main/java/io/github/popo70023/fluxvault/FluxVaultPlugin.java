@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 public class FluxVaultPlugin extends JavaPlugin {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    public static final String MOD_ID = "fluxvault";
 
     public FluxVaultPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -23,6 +24,11 @@ public class FluxVaultPlugin extends JavaPlugin {
 
     public static HytaleLogger getPluginLogger() {
         return LOGGER;
+    }
+
+    @Nonnull
+    public static String loc(@Nonnull String path) {
+        return MOD_ID + ":" + path;
     }
 
     @Override
@@ -39,5 +45,7 @@ public class FluxVaultPlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
+        LOGGER.atInfo().log("Shutting down plugin " + this.getName());
+        FluxAssetRegistry.ClearCacheAtShutdown(this);
     }
 }
