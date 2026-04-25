@@ -1,9 +1,9 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
-package io.github.popo70023.fluxvault.interaction;
+package io.github.popo70023.fluxvault.common.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,15 +11,13 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.popo70023.fluxvault.FluxVaultPlugin;
-import io.github.popo70023.fluxvault.api.IFluxContainerProvider;
+import io.github.popo70023.fluxvault.api.IFluxVaultHost;
 import io.github.popo70023.fluxvault.util.FluxUtil;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
@@ -37,16 +35,12 @@ public class InspectContainerInteraction extends SimpleInstantInteraction {
         if (player == null) return;
 
         BlockPosition targetBlockPos = context.getTargetBlock();
-        BlockPosition targetBlockPosRew = context.getMetaStore().getIfPresentMetaObject(Interaction.TARGET_BLOCK_RAW);
         if (targetBlockPos != null) {
             FluxUtil.forEachBlockComponent(commandBuffer.getExternalData().getWorld(), new Vector3i(targetBlockPos.x, targetBlockPos.y, targetBlockPos.z), component -> {
-                if (component instanceof IFluxContainerProvider provider) {
+                if (component instanceof IFluxVaultHost provider) {
                     provider.sendContainerMessage(player);
                 }
             });
-            player.sendMessage(Message.raw("targetBlockPos: " + targetBlockPos.x + ", " + targetBlockPos.y + ", " + targetBlockPos.z));
-            player.sendMessage(Message.raw("targetBlockPosRew: " + targetBlockPosRew.x + ", " + targetBlockPosRew.y + ", " + targetBlockPosRew.z));
-
         }
     }
 

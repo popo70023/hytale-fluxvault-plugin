@@ -2,7 +2,7 @@
   "BlockType": {
     "Textures": [
       {
-        "All": "BlockTextures/Infinite_Energy_Block.png"
+        "All": "BlockTextures/FluxVault.Infinite_Energy_Block.png"
       }
     ],
     "Material": "Solid",
@@ -40,6 +40,6 @@
     "Description": "server.items.Infinite_Energy_Block.description"
   },
   "PlayerAnimationsId": "Block",
-  "Icon": "Icons/ItemsGenerated/Infinite_Energy_Block.png",
-  "ItemSoundSetId": "ISS_Items_Metal"
+  "ItemSoundSetId": "ISS_Items_Metal",
+  "Icon": "Icons/ItemsGenerated/FluxVault.Infinite_Energy_Block.png"
 }

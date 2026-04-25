@@ -1,5 +1,5 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
@@ -16,7 +16,7 @@ import io.github.popo70023.fluxvault.registry.FluxAssetRegistry;
 
 public class FluxResource implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, FluxResource>> {
     public static final AssetBuilderCodec<String, FluxResource> CODEC;
-    public static final String RESOURCE_ID_KEY = "ResourceID";
+    public static final String RESOURCE_ID_KEY = "ResourceId";
     public static final String UNKNOWN_ID = "Unknown_Resource";
 
     private String resourceId;

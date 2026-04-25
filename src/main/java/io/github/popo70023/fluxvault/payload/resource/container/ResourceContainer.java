@@ -1,12 +1,12 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.resource.container;
 
-import io.github.popo70023.fluxvault.api.AbstractContainer;
 import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.common.flux.AbstractContainer;
 import io.github.popo70023.fluxvault.payload.resource.ResourceStack;
 
 public abstract class ResourceContainer extends AbstractContainer<ResourceStack> {
@@ -22,10 +22,10 @@ public abstract class ResourceContainer extends AbstractContainer<ResourceStack>
     }
 
     @Override
-    public int findFirstIndex() {
+    public short findFirstIndex() {
         lock.readLock().lock();
         try {
-            for (int i = 0; i < getContainerMaxSize(); i++) {
+            for (short i = 0; i < getContainerMaxSize(); i++) {
                 if (!ResourceStack.isEmpty(getContent(i))) return i;
             }
             return -1;
@@ -35,11 +35,11 @@ public abstract class ResourceContainer extends AbstractContainer<ResourceStack>
     }
 
     @Override
-    public int findIndexOfTarget(ResourceStack target, boolean ignoreFull) {
+    public short findIndexOfTarget(ResourceStack target, boolean ignoreFull) {
         if (target == null || !this.resourceId.equals(target.getResourceId())) return -1;
         lock.readLock().lock();
         try {
-            for (int i = 0; i < getContainerMaxSize(); i++) {
+            for (short i = 0; i < getContainerMaxSize(); i++) {
                 ResourceStack theContent = getContent(i);
                 long currentQty = (theContent == null) ? 0 : theContent.getQuantity();
                 if (!ignoreFull || currentQty != getCapacity()) return i;

@@ -1,20 +1,21 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.util;
 
 import com.hypixel.hytale.component.*;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.protocol.BlockFace;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockFace;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import io.github.popo70023.fluxvault.api.*;
+import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.api.IFlux;
+import io.github.popo70023.fluxvault.api.IFluxHandler;
+import io.github.popo70023.fluxvault.api.IFluxHandlerProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,39 +27,8 @@ public final class FluxUtil {
     private FluxUtil() {
     }
 
-    @Nullable
-    public static Ref<ChunkStore> getBlockEntityRef(World world, Vector3i targetBlock) {
-        ChunkStore chunkStore = world.getChunkStore();
-        long chunkIndex = ChunkUtil.indexChunkFromBlock(targetBlock.x, targetBlock.z);
-        BlockComponentChunk blockComponentChunk = chunkStore.getChunkComponent(chunkIndex, BlockComponentChunk.getComponentType());
-
-        if (blockComponentChunk == null) return null;
-
-        int blockIndex = ChunkUtil.indexBlockInColumn(targetBlock.x, targetBlock.y, targetBlock.z);
-        Ref<ChunkStore> blockRef = blockComponentChunk.getEntityReference(blockIndex);
-
-        if (blockRef != null && blockRef.isValid()) {
-            BlockModule.BlockStateInfo stateInfo = blockRef.getStore().getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
-            if (stateInfo != null && stateInfo.getChunkRef().isValid()) {
-                return blockRef;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static <T extends Component<ChunkStore>> T getBlockComponent(World world, Vector3i targetBlock, ComponentType<ChunkStore, T> componentType) {
-        Ref<ChunkStore> blockRef = getBlockEntityRef(world, targetBlock);
-
-        if (blockRef != null) {
-            return blockRef.getStore().getComponent(blockRef, componentType);
-        }
-
-        return null;
-    }
-
     public static void forEachBlockComponent(World world, Vector3i targetBlock, Consumer<Component<ChunkStore>> action) {
-        Ref<ChunkStore> blockRef = getBlockEntityRef(world, targetBlock);
+        Ref<ChunkStore> blockRef = BlockModule.getBlockEntity(world, targetBlock.x, targetBlock.y, targetBlock.z);
         if (blockRef == null) return;
 
         Store<ChunkStore> store = blockRef.getStore();
@@ -74,7 +44,7 @@ public final class FluxUtil {
 
     @Nullable
     public static <R> R queryBlockComponents(World world, Vector3i targetBlock, Function<Component<ChunkStore>, R> query) {
-        Ref<ChunkStore> blockRef = getBlockEntityRef(world, targetBlock);
+        Ref<ChunkStore> blockRef = BlockModule.getBlockEntity(world, targetBlock.x, targetBlock.y, targetBlock.z);
         if (blockRef == null) return null;
 
         Store<ChunkStore> store = blockRef.getStore();
@@ -95,20 +65,10 @@ public final class FluxUtil {
     }
 
     @Nullable
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getBlockFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, @Nonnull BlockFace side, String slotName, @Nonnull IFluxHandlerProvider.FluxAccess access) {
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getBlockFluxHandler(World world, Vector3i targetBlock, FluxType<F, D> fluxType, @Nullable BlockFace side, String targetName, @Nonnull IFluxHandlerProvider.FluxAccess access) {
         return queryBlockComponents(world, targetBlock, component -> {
-            if (component instanceof IFluxHandlerProvider provider) {
-                return provider.getFluxHandler(fluxType, side, slotName, access);
-            }
-            return null;
-        });
-    }
-
-    @Nullable
-    public static IFluxContainerProvider getBlockInformationProvider(World world, Vector3i targetBlock) {
-        return queryBlockComponents(world, targetBlock, component -> {
-            if (component instanceof IFluxContainerProvider provider) {
-                return provider;
+            if (component instanceof IFluxHandlerProvider.Block provider) {
+                return provider.getFluxHandler(fluxType, side, targetName, access);
             }
             return null;
         });
@@ -158,10 +118,10 @@ public final class FluxUtil {
     }
 
     @Nullable
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getEntityFluxHandler(Ref<EntityStore> entityRef, @Nonnull FluxType<F, D> fluxType, @Nonnull String detail, @Nullable String slotName, @Nonnull IFluxHandlerProvider.FluxAccess access) {
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getEntityFluxHandler(Ref<EntityStore> entityRef, @Nonnull FluxType<F, D> fluxType, @Nonnull String detail, @Nullable String targetName, @Nonnull IFluxHandlerProvider.FluxAccess access) {
         return queryEntityComponent(entityRef, component -> {
-            if (component instanceof IFluxHandlerProvider provider) {
-                return provider.getFluxHandler(fluxType, detail, slotName, access);
+            if (component instanceof IFluxHandlerProvider.Entity provider) {
+                return provider.getFluxHandler(fluxType, detail, targetName, access);
             }
             return null;
         });

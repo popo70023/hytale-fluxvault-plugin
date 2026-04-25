@@ -1,5 +1,5 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class CreativeResourceComponent<ECS_TYPE> implements Component<ECS_TYPE>, IFluxHandlerProvider {
+public abstract class CreativeResourceComponent<ECS_TYPE> implements Component<ECS_TYPE>, IFluxHandlerProvider<BlockFace> {
     protected Set<String> supportedResources = Collections.emptySet();
     protected boolean isVoid = false;
     private transient volatile Map<String, CreativeResourceHandler> handlerCache;

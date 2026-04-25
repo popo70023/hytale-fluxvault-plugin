@@ -1,10 +1,12 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.liquid.interaction;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.math.vector.Vector3i;
@@ -30,10 +32,11 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class DrainLiquidContainerBlockInteraction extends SimpleBlockInteraction {
     public static final String Id = FluxVaultPlugin.loc("Drain_Liquid_Container_Block");
     public static final BuilderCodec<DrainLiquidContainerBlockInteraction> CODEC;
+    private String targetName = null;
 
     @Override
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NullableDecl ItemStack itemInHand, @NonNullDecl Vector3i pos, @NonNullDecl CooldownHandler cooldownHandler) {
-        IFluxHandler<LiquidFlux> handler = InteractionUtil.getBlockFluxHandler(world, pos, FluxType.LIQUID, null, IFluxHandlerProvider.FluxAccess.DRAIN);
+        IFluxHandler<LiquidFlux> handler = InteractionUtil.getBlockFluxHandler(world, pos, FluxType.LIQUID, targetName, IFluxHandlerProvider.FluxAccess.DRAIN);
         InteractionSyncData state = context.getState();
 
         if (itemInHand == null || itemInHand.isEmpty() || handler == null) {
@@ -70,6 +73,7 @@ public class DrainLiquidContainerBlockInteraction extends SimpleBlockInteraction
     static {
         CODEC = BuilderCodec.builder(DrainLiquidContainerBlockInteraction.class, DrainLiquidContainerBlockInteraction::new, SimpleBlockInteraction.CODEC)
                 .documentation("Drain a target block's liquid container using a fluid-holding item from the player's hand.")
+                .append(new KeyedCodec<>("TargetName", Codec.STRING), (o, v) -> o.targetName = v, (o) -> o.targetName).add()
                 .build();
     }
 }

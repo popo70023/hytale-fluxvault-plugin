@@ -1,11 +1,13 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.api;
 
-import java.util.List;
+import io.github.popo70023.fluxvault.common.flux.transaction.IFluxTransaction;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+
 import java.util.function.Predicate;
 
 /**
@@ -17,26 +19,26 @@ import java.util.function.Predicate;
  * Component state persistence (Serialization/Deserialization), or absolute administrative overrides.
  * </p>
  *
- * @param <D> The data type (e.g., LiquidStack, FluxEnergy).
+ * @param <D> The data type (e.g., LiquidStack, ResourceStack).
  */
 public interface IFluxContainer<D> {
 
     /**
      * @return The maximum number of distinct stacks (slots) this container can physically hold.
      */
-    int getContainerMaxSize();
+    short getContainerMaxSize();
 
     /**
-     * Retrieves a snapshot or view of all contents.
+     * Retrieves a sparse map snapshot of all valid contents.
      * <p>
-     * <b>MUTABILITY WARNING:</b> The returned list and its elements MUST be treated as strictly read-only.
-     * Mutating these objects directly will bypass the container's concurrency locks and trigger thread-safety
-     * violations or dirty reads.
+     * <b>PERFORMANCE & MUTABILITY WARNING:</b> This returns an Short2ObjectMap to support sparse
+     * inventory storage (e.g., items only in slots 0 and 100). The map and its elements MUST be
+     * treated as strictly read-only.
      * </p>
      *
-     * @return A list of the current contents. Never null, but may contain empty equivalents.
+     * @return A map of slot indices to their respective content. Never null, but may be empty.
      */
-    List<D> getContents();
+    Short2ObjectMap<D> getContents();
 
     /**
      * Retrieves the exact content residing in a specific slot.
@@ -47,7 +49,7 @@ public interface IFluxContainer<D> {
      * @param index The zero-based index of the slot.
      * @return The content in the slot, or the system's empty equivalent.
      */
-    D getContent(int index);
+    D getContent(short index);
 
     /**
      * Directly overwrites the content in a slot, bypassing all standard I/O capability checks.
@@ -61,12 +63,12 @@ public interface IFluxContainer<D> {
      * @param index   The zero-based index of the slot to overwrite.
      * @param content The new content to forcefully inject, or null to empty the slot.
      */
-    void setContent(int index, D content);
+    void setContent(short index, D content);
 
     /**
      * @return The index of the first slot that contains valid, non-empty data, or -1 if entirely empty.
      */
-    int findFirstIndex();
+    short findFirstIndex();
 
     /**
      * Finds the index of a specific resource type.
@@ -75,17 +77,19 @@ public interface IFluxContainer<D> {
      * @param ignoreFull If true, skips slots that have already reached their maximum capacity.
      * @return The target index, or -1 if no suitable slot is found.
      */
-    int findIndexOfTarget(D target, boolean ignoreFull);
+    short findIndexOfTarget(D target, boolean ignoreFull);
 
     /**
-     * Internal lifecycle hook triggered immediately after any physical contents or capacity states are mutated.
+     * Internal lifecycle hook triggered immediately after physical contents are mutated.
      * <p>
-     * <b>ARCHITECTURAL CONTRACT:</b> This method serves as the central notification hub for the Observer pattern.
-     * Implementations MUST use this hook to flag the underlying ECS Component as dirty,
-     * trigger Server-to-Client state synchronization (RPC), or update subscribed GUI listeners.
+     * <b>ARCHITECTURAL CONTRACT:</b>
+     * Implementations MUST use this hook to fire specific update events based on the provided
+     * transaction. Listeners (like GUIs) can use the transaction details to perform highly
+     * optimized partial UI updates instead of full redraws.
      * </p>
+     * * @param transaction The exact record of what slots were modified.
      */
-    void onContentsChanged();
+    void onContentsChanged(IFluxTransaction transaction);
 
     /**
      * @return The maximum mathematical capacity of this container.
@@ -102,5 +106,10 @@ public interface IFluxContainer<D> {
      */
     default Predicate<D> getValidator() {
         return _ -> true;
+    }
+
+    default boolean matchesWithContainer(D targetData) {
+        if (targetData == null) return false;
+        return getValidator().test(targetData);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
@@ -34,7 +34,7 @@ public class LiquidContainerWindow extends BlockWindow {
         this.windowData.addProperty("blockItemId", item.getId());
         long capacity = fluxContainers.getCapacity();
         this.windowData.addProperty("containerCapacity", capacity);
-        for (int i = 0; i < fluxContainers.getContainerMaxSize(); i++) {
+        for (short i = 0; i < fluxContainers.getContainerMaxSize(); i++) {
             LiquidStack content = fluxContainers.getContent(i);
             if (content != null && !content.isEmpty()) {
                 long quantity = content.getQuantity();

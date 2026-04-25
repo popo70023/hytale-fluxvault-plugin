@@ -1,5 +1,5 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
@@ -8,7 +8,6 @@ package io.github.popo70023.fluxvault.util;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.protocol.BlockFace;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -31,14 +30,14 @@ public final class InteractionUtil {
     private InteractionUtil() {
     }
 
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getBlockFluxHandler(World world, Vector3i targetBlock, @Nonnull FluxType<F, D> fluxType, String tag, IFluxHandlerProvider.FluxAccess access) {
-        return FluxUtil.getBlockFluxHandler(world, targetBlock, fluxType, BlockFace.None, tag, access);
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getBlockFluxHandler(World world, Vector3i targetBlock, @Nonnull FluxType<F, D> fluxType, String targetName, IFluxHandlerProvider.FluxAccess access) {
+        return FluxUtil.getBlockFluxHandler(world, targetBlock, fluxType, null, targetName, access);
     }
 
-    public static <F extends IFlux<D>, D> IFluxHandler<F> getEntityFluxHandler(@Nonnull InteractionContext context, @Nonnull FluxType<F, D> fluxType, String slotName, IFluxHandlerProvider.FluxAccess access) {
+    public static <F extends IFlux<D>, D> IFluxHandler<F> getEntityFluxHandler(@Nonnull InteractionContext context, @Nonnull FluxType<F, D> fluxType, String targetName, IFluxHandlerProvider.FluxAccess access) {
         Ref<EntityStore> targetEntity = context.getTargetEntity();
         String hitDetail = context.getMetaStore().getIfPresentMetaObject(Interaction.HIT_DETAIL);
-        return FluxUtil.getEntityFluxHandler(targetEntity, fluxType, hitDetail != null ? hitDetail : "", slotName, access);
+        return FluxUtil.getEntityFluxHandler(targetEntity, fluxType, hitDetail != null ? hitDetail : "", targetName, access);
     }
 
     public static void exchangeHeldItem(CommandBuffer<EntityStore> commandBuffer, InteractionContext context, int consumeAmount, ItemStack resultItem) {

@@ -59,8 +59,19 @@
     },
     "BlockEntity": {
       "Components": {
-        "fluxvault:SimpleLiquidContainerBlock": {
-          "Capacity": 10000
+        "fluxvault:SimpleLiquidContainer": {
+          "Routing": [
+            {
+              "Faces": "All",
+              "Target": "Storage"
+            }
+          ],
+          "ContainerBluePrints": {
+            "Storage": {
+              "Capacity": 10000,
+              "Size": 1
+            }
+          }
         }
       }
     }

@@ -1,12 +1,13 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
-package io.github.popo70023.fluxvault.api;
+package io.github.popo70023.fluxvault.common.flux;
+
+import io.github.popo70023.fluxvault.api.IFlux;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -56,7 +57,7 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
     @Override
     public void setValidator(Predicate<D> validator) {
         ensureMutableAttributes();
-        attributes.validator = (validator != null) ? validator : _ -> true;
+        attributes.validator = validator != null ? validator : _ -> true;
     }
 
     @Override
@@ -124,11 +125,6 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         }
 
         @Override
-        public List<D> getStacks() {
-            return Collections.unmodifiableList(stacks);
-        }
-
-        @Override
         public D getStack(int index) {
             if (index >= 0 && index < stacks.size()) {
                 return stacks.get(index);
@@ -188,11 +184,6 @@ public abstract class AbstractFlux<D> implements IFlux<D> {
         @Override
         public int getStackCount() {
             return 1;
-        }
-
-        @Override
-        public List<D> getStacks() {
-            return content == null ? Collections.emptyList() : Collections.singletonList(content);
         }
 
         /**

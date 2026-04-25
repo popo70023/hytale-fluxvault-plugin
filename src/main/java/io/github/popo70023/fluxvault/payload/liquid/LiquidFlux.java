@@ -1,20 +1,20 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.liquid;
 
-import io.github.popo70023.fluxvault.api.AbstractFlux;
+import io.github.popo70023.fluxvault.common.flux.AbstractFlux;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
     public LiquidFlux(LiquidStack... stacks) {
-        super(new ArrayList<>(List.of(stacks)));
+        super(new ObjectArrayList<>(List.of(stacks)));
     }
 
     public LiquidFlux(List<LiquidStack> stacks) {
@@ -22,7 +22,7 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
     }
 
     public static LiquidFlux copyOf(LiquidStack... stacks) {
-        List<LiquidStack> copies = new ArrayList<>(stacks.length);
+        List<LiquidStack> copies = new ObjectArrayList<>(stacks.length);
         for (LiquidStack s : stacks) {
             if (s != null) copies.add(s.copy());
         }
@@ -95,7 +95,7 @@ public class LiquidFlux extends AbstractFlux.Bundle<LiquidStack> {
 
     @Override
     public LiquidFlux copy() {
-        List<LiquidStack> newStacks = new ArrayList<>(this.stacks.size());
+        List<LiquidStack> newStacks = new ObjectArrayList<>(this.stacks.size());
         for (LiquidStack s : this.stacks) {
             newStacks.add(s.copy());
         }

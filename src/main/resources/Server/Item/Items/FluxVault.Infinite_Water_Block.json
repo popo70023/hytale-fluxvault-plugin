@@ -2,7 +2,7 @@
   "BlockType": {
     "Textures": [
       {
-        "All": "BlockTextures/Infinite_Water_Block.png"
+        "All": "BlockTextures/FluxVault.Infinite_Water_Block.png"
       }
     ],
     "BlockEntity": {
@@ -27,7 +27,7 @@
     "ParticleColor": "#084efb",
     "BlockSoundSetId": "Metal"
   },
-  "Icon": "Icons/ItemsGenerated/Infinite_Water_Block.png",
+  "Icon": "Icons/ItemsGenerated/FluxVault.Infinite_Water_Block.png",
   "IconProperties": {
     "Scale": 0.58823,
     "Rotation": [

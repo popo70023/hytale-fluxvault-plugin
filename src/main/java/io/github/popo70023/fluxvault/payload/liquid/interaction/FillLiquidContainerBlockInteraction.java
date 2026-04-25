@@ -1,10 +1,12 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.liquid.interaction;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -32,12 +34,13 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 public class FillLiquidContainerBlockInteraction extends SimpleBlockInteraction {
     public static final String Id = FluxVaultPlugin.loc("Fill_Liquid_Container_Block");
     public static final BuilderCodec<FillLiquidContainerBlockInteraction> CODEC;
+    private String targetName = null;
 
     @Override
     protected void interactWithBlock(@NonNullDecl World world, @NonNullDecl CommandBuffer<EntityStore> commandBuffer, @NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NullableDecl ItemStack itemInHand, @NonNullDecl Vector3i pos, @NonNullDecl CooldownHandler cooldownHandler) {
         Ref<EntityStore> playerRef = context.getEntity();
         Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
-        IFluxHandler<LiquidFlux> handler = InteractionUtil.getBlockFluxHandler(world, pos, FluxType.LIQUID, null, IFluxHandlerProvider.FluxAccess.FILL);
+        IFluxHandler<LiquidFlux> handler = InteractionUtil.getBlockFluxHandler(world, pos, FluxType.LIQUID, targetName, IFluxHandlerProvider.FluxAccess.FILL);
         InteractionSyncData state = context.getState();
 
         if (player == null || itemInHand == null || itemInHand.isEmpty() || handler == null) {
@@ -73,6 +76,7 @@ public class FillLiquidContainerBlockInteraction extends SimpleBlockInteraction 
     static {
         CODEC = BuilderCodec.builder(FillLiquidContainerBlockInteraction.class, FillLiquidContainerBlockInteraction::new, SimpleBlockInteraction.CODEC)
                 .documentation("Fills a target block's liquid activeContainer using a fluid-holding item from the player's hand.")
+                .append(new KeyedCodec<>("TargetName", Codec.STRING), (o, v) -> o.targetName = v, (o) -> o.targetName).add()
                 .build();
     }
 }

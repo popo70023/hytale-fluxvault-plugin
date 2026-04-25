@@ -1,25 +1,51 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
-package io.github.popo70023.fluxvault.api;
+package io.github.popo70023.fluxvault.common.flux;
 
+import io.github.popo70023.fluxvault.api.IFluxContainer;
+import io.github.popo70023.fluxvault.api.IFluxHandler;
+import io.github.popo70023.fluxvault.common.flux.transaction.IFluxTransaction;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class AbstractContainer<D> implements IFluxContainer<D> {
-    public static final String ACTIVE_CONTAINER_KEY = "ActiveContainer";
     public static final String ACTIVE_CONTAINERS_KEY = "ActiveContainers";
     public static final String ACTIVE_CONTAINER_DOCUMENTATION = "Optional initial payload. Leave blank to generate an empty container at runtime.";
     public static final String CONTENT_KEY = "Content";
     public static final String CONTENTS_KEY = "Contents";
     public static final String CAPACITY_KEY = "Capacity";
     public static final String CAPACITY_DOCUMENTATION = "The maximum volume of resources/contents this container can hold.";
+    public static final String SIZE_KEY = "Size";
+    public static final String SIZE_DOCUMENTATION = "The maximum volume of stack this container can hold.";
+    public static final String BLUE_PRINTS_KEY = "ContainerBluePrints";
 
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    protected final transient List<Consumer<IFluxTransaction>> changeListeners = new CopyOnWriteArrayList<>();
 
-    public void onContentsChanged() {
+    @Override
+    public void onContentsChanged(IFluxTransaction transaction) {
+        for (Consumer<IFluxTransaction> listener : this.changeListeners) {
+            listener.accept(transaction);
+        }
+    }
+
+    public void addChangeListener(Consumer<IFluxTransaction> listener) {
+        if (listener != null) {
+            this.changeListeners.add(listener);
+        }
+    }
+
+    public void clearChangeListeners() {
+        if (this.changeListeners != null) {
+            this.changeListeners.clear();
+        }
     }
 
     /**

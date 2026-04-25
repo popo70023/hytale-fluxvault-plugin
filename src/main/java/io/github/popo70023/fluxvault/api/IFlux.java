@@ -1,12 +1,11 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.api;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -26,14 +25,6 @@ public interface IFlux<D> {
      * @return The number of stacks in this carrier. For Packets, this is typically 1.
      */
     int getStackCount();
-
-    /**
-     * Retrieves an unmodifiable view of all contained stacks.
-     *
-     * @return A list view of all stacks. Modifications to the list itself will throw an exception,
-     * but the underlying elements may still be mutable depending on implementation.
-     */
-    List<D> getStacks();
 
     /**
      * Retrieves the stack at the specified index.

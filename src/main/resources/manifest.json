@@ -1,8 +1,8 @@
 {
     "Group": "fluxvault",
     "Name": "Flux Vault",
-    "Version": "0.2.0",
-    "Description": "A universal transport protocol and storage framework. Features native support for items, liquids, and energy, while allowing developers to easily route their own custom data.",
+    "Version": "0.3.0",
+    "Description": "The Ultimate ECS Resource Storage & Capability Framework. Features native support for items, liquids, and energy, while allowing developers to easily route their own custom data.",
     "Authors": [
         {
             "Name": "Ben (popo70023)",

@@ -1,5 +1,5 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class LiquidCapsuleTypes implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, LiquidCapsuleTypes>> {
+public final class LiquidCapsuleTypes implements JsonAssetWithMap<String, IndexedLookupTableAssetMap<String, LiquidCapsuleTypes>> {
     public static final AssetBuilderCodec<String, LiquidCapsuleTypes> CODEC;
 
     private String registryId;

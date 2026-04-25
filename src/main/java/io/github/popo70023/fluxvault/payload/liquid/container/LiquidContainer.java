@@ -1,12 +1,12 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.liquid.container;
 
-import io.github.popo70023.fluxvault.api.AbstractContainer;
 import io.github.popo70023.fluxvault.api.FluxType;
+import io.github.popo70023.fluxvault.common.flux.AbstractContainer;
 import io.github.popo70023.fluxvault.payload.liquid.LiquidStack;
 
 import java.util.Collections;
@@ -26,35 +26,6 @@ public abstract class LiquidContainer extends AbstractContainer<LiquidStack> {
         super();
         this.setAcceptedHazards(acceptedHazards);
         this.setWhitelist(whitelist);
-    }
-
-    @Override
-    public int findFirstIndex() {
-        lock.readLock().lock();
-        try {
-            for (int i = 0; i < getContainerMaxSize(); i++) {
-                if (!getContent(i).isEmpty()) return i;
-            }
-            return -1;
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public int findIndexOfTarget(LiquidStack target, boolean ignoreFull) {
-        lock.readLock().lock();
-        try {
-            for (int i = 0; i < getContainerMaxSize(); i++) {
-                LiquidStack theContent = getContent(i);
-                if (theContent.isEquivalentType(target)) {
-                    if (!ignoreFull || theContent.getQuantity() != getCapacity()) return i;
-                }
-            }
-            return -1;
-        } finally {
-            lock.readLock().unlock();
-        }
     }
 
     public Predicate<LiquidStack> getValidator() {
@@ -125,7 +96,7 @@ public abstract class LiquidContainer extends AbstractContainer<LiquidStack> {
     public abstract static class FixedCapacity extends LiquidContainer {
         protected volatile long capacity;
 
-        protected FixedCapacity(long capacity, Set<String> supportedTags, Set<String> whitelist) {
+        protected FixedCapacity(Set<String> supportedTags, Set<String> whitelist, long capacity) {
             super(supportedTags, whitelist);
             this.capacity = capacity;
         }

@@ -2,7 +2,7 @@
   "BlockType": {
     "Textures": [
       {
-        "All": "BlockTextures/Liquid_Energy_Void_Block.png"
+        "All": "BlockTextures/FluxVault.Liquid_Energy_Void_Block.png"
       }
     ],
     "Material": "Solid",
@@ -54,6 +54,6 @@
     "Description": "server.items.Liquid_Energy_Void_Block.description"
   },
   "PlayerAnimationsId": "Block",
-  "Icon": "Icons/ItemsGenerated/Liquid_Energy_Void_Block.png",
+  "Icon": "Icons/ItemsGenerated/FluxVault.Liquid_Energy_Void_Block.png",
   "ItemSoundSetId": "ISS_Items_Metal"
 }

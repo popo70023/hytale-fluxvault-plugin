@@ -1,42 +1,35 @@
 /*
- * FluxVault - A universal transport protocol for Hytale.
+ * FluxVault - The Ultimate ECS Resource Storage & Capability Framework for Hytale.
  * Copyright (c) 2026 Ben (popo70023)
  * Licensed under the MIT License.
  */
 package io.github.popo70023.fluxvault.payload.liquid.container;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import io.github.popo70023.fluxvault.api.AbstractContainer;
 import io.github.popo70023.fluxvault.api.IFluxHandler;
+import io.github.popo70023.fluxvault.common.flux.transaction.FluxSlotTransaction;
+import io.github.popo70023.fluxvault.common.flux.transaction.IFluxTransaction;
 import io.github.popo70023.fluxvault.payload.liquid.Liquid;
 import io.github.popo70023.fluxvault.payload.liquid.LiquidFlux;
 import io.github.popo70023.fluxvault.payload.liquid.LiquidStack;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMaps;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 public class SingleLiquidContainer extends LiquidContainer.FixedCapacity implements IFluxHandler<LiquidFlux> {
-    public static final BuilderCodec<SingleLiquidContainer> CODEC;
     private LiquidStack content;
+    private final short slot;
 
-    public SingleLiquidContainer() {
-        super(10000, Collections.emptySet(), Collections.emptySet());
-        this.content = LiquidStack.EMPTY;
-    }
-
-    public SingleLiquidContainer(long capacity, Set<String> acceptedHazards, Set<String> whitelist, LiquidStack content) {
-        super(capacity, acceptedHazards, whitelist);
-        this.content = content;
+    public SingleLiquidContainer(SimpleLiquidContainer other, short slot) {
+        super(other.getAcceptedHazards(), other.getWhitelist(), other.getCapacity());
+        this.slot = slot;
+        this.content = other.getContent(slot);
     }
 
     public SingleLiquidContainer(SingleLiquidContainer other) {
-        super(other.getCapacity(), other.getAcceptedHazards(), other.getWhitelist());
+        super(other.getAcceptedHazards(), other.getWhitelist(), other.getCapacity());
         other.lock.readLock().lock();
         try {
+            this.slot = other.slot;
             this.content = other.content.copy();
         } finally {
             other.lock.readLock().unlock();
@@ -44,39 +37,39 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
     }
 
     @Override
-    public int getContainerMaxSize() {
+    public short getContainerMaxSize() {
         return 1;
     }
 
     @Override
-    public List<LiquidStack> getContents() {
+    public Short2ObjectMap<LiquidStack> getContents() {
         lock.readLock().lock();
         try {
-            return List.of(this.content.copy());
+            return Short2ObjectMaps.singleton(slot, content.copy());
         } finally {
             lock.readLock().unlock();
         }
     }
 
     @Override
-    public LiquidStack getContent(int index) {
+    public LiquidStack getContent(short index) {
         lock.readLock().lock();
         try {
-            return index == 0 ? content.copy() : null;
+            return index == slot ? content.copy() : null;
         } finally {
             lock.readLock().unlock();
         }
     }
 
     public LiquidStack getContent() {
-        return getContent(0);
+        return getContent(slot);
     }
 
     @Override
-    public void setContent(int index, LiquidStack content) {
+    public void setContent(short index, LiquidStack content) {
         lock.writeLock().lock();
         try {
-            if (index == 0) {
+            if (index == slot) {
                 this.content = (content == null) ? LiquidStack.EMPTY : content.copy();
             }
         } finally {
@@ -84,8 +77,18 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
         }
     }
 
+    @Override
+    public short findFirstIndex() {
+        return content.isEmpty() ? -1 : slot;
+    }
+
+    @Override
+    public short findIndexOfTarget(LiquidStack target, boolean ignoreFull) {
+        return content.isEquivalentType(target) ? slot : -1;
+    }
+
     public void setContent(LiquidStack content) {
-        setContent(0, content);
+        setContent(slot, content);
     }
 
     @Override
@@ -180,12 +183,21 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
                 }
             }
 
+            LiquidStack stateBefore = this.content.copy();
+            LiquidStack stateAfter;
             if (currentlyEmpty) {
                 this.content = LiquidStack.of(acceptedLiquidId, totalActualFilled);
             } else {
                 this.content.addQuantity(totalActualFilled);
             }
-            onContentsChanged();
+            stateAfter = this.content.copy();
+
+            long amtBefore = stateBefore.isEmpty() ? 0 : stateBefore.getQuantity();
+            long amtAfter = stateAfter.isEmpty() ? 0 : stateAfter.getQuantity();
+            long delta = amtAfter - amtBefore;
+            String contentId = stateBefore.isEmpty() ? stateAfter.getLiquidId() : stateBefore.getLiquidId();
+            FluxSlotTransaction<LiquidStack> transaction = new FluxSlotTransaction<>(IFluxTransaction.ActionType.ADD, slot, contentId, delta, stateBefore, stateAfter);
+            onContentsChanged(transaction);
 
             return resultFlux.addStack(LiquidStack.of(acceptedLiquidId, totalActualFilled));
 
@@ -267,28 +279,24 @@ public class SingleLiquidContainer extends LiquidContainer.FixedCapacity impleme
                 }
             }
 
+            LiquidStack stateBefore = this.content.copy();
+            LiquidStack stateAfter;
             if (this.content.addQuantity(-totalActualDrained) == 0) {
                 this.content = LiquidStack.EMPTY;
             }
-            onContentsChanged();
+            stateAfter = this.content.copy();
+
+            long amtBefore = stateBefore.isEmpty() ? 0 : stateBefore.getQuantity();
+            long amtAfter = stateAfter.isEmpty() ? 0 : stateAfter.getQuantity();
+            long delta = amtAfter - amtBefore;
+            String contentId = stateBefore.isEmpty() ? stateAfter.getLiquidId() : stateBefore.getLiquidId();
+            FluxSlotTransaction<LiquidStack> transaction = new FluxSlotTransaction<>(IFluxTransaction.ActionType.REMOVE, slot, contentId, delta, stateBefore, stateAfter);
+            onContentsChanged(transaction);
 
             return resultFlux.addStack(LiquidStack.of(contentLiquidId, totalActualDrained));
 
         } finally {
             activeLock.unlock();
         }
-    }
-
-    static {
-        CODEC = BuilderCodec.builder(SingleLiquidContainer.class, SingleLiquidContainer::new)
-                .append(new KeyedCodec<>(AbstractContainer.CAPACITY_KEY, Codec.LONG), SingleLiquidContainer::setCapacity, SingleLiquidContainer::getCapacity)
-                .add()
-                .append(new KeyedCodec<>(LiquidContainer.ACCEPTED_HAZARDS_KEY, Codec.STRING_ARRAY), (container, v) -> container.setAcceptedHazards(v != null ? Set.of(v) : null), (container) -> container.getAcceptedHazards().toArray(String[]::new))
-                .documentation(LiquidContainer.ACCEPTED_HAZARDS_DOCUMENTATION).add()
-                .append(new KeyedCodec<>(LiquidContainer.WHITELIST_KEY, Codec.STRING_ARRAY), (container, v) -> container.setWhitelist(v != null ? Set.of(v) : null), (container) -> container.getWhitelist().toArray(String[]::new))
-                .documentation(LiquidContainer.WHITELIST_DOCUMENTATION).add()
-                .append(new KeyedCodec<>(AbstractContainer.CONTENT_KEY, LiquidStack.CODEC), (container, v) -> container.setContent(v), SingleLiquidContainer::getContent)
-                .add()
-                .build();
     }
 }
